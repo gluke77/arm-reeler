@@ -57,6 +57,8 @@ void control_on(int /* control */);
 void control_off(int /* control */);
 void control_init(void);
 
+void do_control(void);
+
 
 #ifdef __cplusplus__
 }

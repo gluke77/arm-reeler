@@ -1,6 +1,7 @@
 #include "common.h"
 #include "control.h"
 #include "rtc.h"
+#include "timer.h"
 
 static int gs_controls = 0;
 
@@ -28,8 +29,10 @@ void control_on(int control_id)
 	if ((0 > control_id) || (control_id > CONTROL_COUNT - 1))
 		return;
 
+	timer_suspend();
 	CLEARBIT(gs_controls, control_id);
-	shift_out(gs_controls);
+	timer_resume();
+//	shift_out(gs_controls);
 }
 
 void control_off(int control_id)
@@ -37,8 +40,10 @@ void control_off(int control_id)
 	if ((0 > control_id) || (control_id > CONTROL_COUNT - 1))
 		return;
 
+	timer_suspend();
 	SETBIT(gs_controls, control_id);
-	shift_out(gs_controls);
+	timer_resume();
+//	shift_out(gs_controls);
 }
 
 void shift_init(void)
@@ -80,4 +85,9 @@ void shift_out(int word)
   SHIFT_SET_LOUT;
   _delay_us(5);
   SHIFT_CLEAR_LOUT;
+}
+
+void do_control()
+{
+	shift_out(gs_controls);
 }

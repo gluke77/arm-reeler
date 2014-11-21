@@ -16,6 +16,9 @@ int start_timer(int /* delay_ms */);
 void stop_timer(int /* timer_id */);
 int timer_value(int /* timer_id */);
 void delay_ms(int /* delay_ms */);
+void timer_suspend(void);
+void timer_resume(void);
+
 
 extern volatile int timer_seconds_total;
 extern volatile int timer_mseconds_total;

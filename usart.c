@@ -311,7 +311,7 @@ void usart0_rx_byte_uzs(char byte)
 	}
 	else if (USART0_INBUF_SIZE == usart0_inbuf_pos)
 	{
-		memset(usart0_inbuf, 0x00, USART0_INBUF_SIZE);
+		memset((void *)usart0_inbuf, 0x00, USART0_INBUF_SIZE);
 		usart0_inbuf_pos = 0;
 		usart0_msg_ready = 0;
 	}
@@ -337,7 +337,7 @@ void usart0_rx_byte_sec(char byte)
 	}
 	else if (USART0_INBUF_SIZE == usart0_inbuf_pos)
 	{
-		memset(usart0_inbuf, 0x00, USART0_INBUF_SIZE);
+		memset((void *)usart0_inbuf, 0x00, USART0_INBUF_SIZE);
 		usart0_inbuf_pos = 0;
 		usart0_msg_ready = 0;
 	}
@@ -654,7 +654,7 @@ void usart1_rx_byte_uzs(char byte)
 	}
 	else if (USART1_INBUF_SIZE == usart1_inbuf_pos)
 	{
-		memset(usart1_inbuf, 0x00, USART1_INBUF_SIZE);
+		memset((void *)usart1_inbuf, 0x00, USART1_INBUF_SIZE);
 		usart1_inbuf_pos = 0;
 		usart1_msg_ready = 0;
 	}
@@ -680,7 +680,7 @@ void usart1_rx_byte_sec(char byte)
 	}
 	else if (USART1_INBUF_SIZE == usart1_inbuf_pos)
 	{
-		memset(usart1_inbuf, 0x00, USART1_INBUF_SIZE);
+		memset((void *)usart1_inbuf, 0x00, USART1_INBUF_SIZE);
 		usart1_inbuf_pos = 0;
 		usart1_msg_ready = 0;
 	}

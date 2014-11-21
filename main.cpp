@@ -24,7 +24,10 @@
 #include "sensorform.h"
 #include "controlform.h"
 
-char buf[80];
+char buf[200];
+
+int msec_begin;
+int msec_end;
 
 //void process_usart0(void);
 void process_usart1(void);
@@ -34,8 +37,21 @@ void touch_pressed(int, int);
 void touch_released(int, int);
 void do_stop(void);
 
+#define TIMER_TIMEOUT (10)
+
 extern "C" void do_timer(void)
 {
+	static int timeout = TIMER_TIMEOUT;
+
+	do_layer();
+	do_stop();
+
+	if (!timeout--)
+	{
+		timeout = TIMER_TIMEOUT;
+
+		do_control();
+	}
 }
 
 int main(void)
@@ -48,7 +64,8 @@ int main(void)
 	control_init();
 	beep_init();
 
-	usart0_init(USART_RS485_SLAVE | USART_INT_DISABLE, 115200);
+	usart0_init(USART_RS232 | USART_INT_DISABLE, 115200);
+	//usart0_init(USART_RS485_SLAVE | USART_INT_DISABLE, 115200);
 	usart1_init(USART_RS485_MASTER| USART_INT_ENABLE, 19200);
 
 	lcd_init();
@@ -78,6 +95,9 @@ int main(void)
 
 	while (1)
 	{
+
+//		msec_begin = timer_mseconds_total;
+
 		if (0 == blink_timer_id)
 			blink_timer_id = start_timer(250);
 
@@ -88,24 +108,24 @@ int main(void)
 			if (mainfrm.isVisible())
 				mainfrm.doBlink();
 		}
-		
+
 		do_touch();
-		
-		if (!controlfrm.isVisible())
+
+		if (controlfrm.isVisible())
 		{
 			do_reel();
 		}
-		
-		do_layer();
-
-		do_stop();
 
 		if (sensorfrm.isVisible())
 			sensorfrm.update();
 
-		//_delay_ms(10);
-
 		process_usart1();
+
+//		msec_end = timer_mseconds_total;
+
+//		sprintf(buf, "duration = %d\n", msec_end - msec_begin);
+
+//		usart0_puts(buf);
 
 	}
 }
@@ -342,5 +362,7 @@ void do_stop(void)
 
 	reel_tension_off(REEL_A);
 	reel_tension_off(REEL_B);
+
+	do_control();
 }
 

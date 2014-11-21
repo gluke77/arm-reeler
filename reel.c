@@ -101,6 +101,9 @@ void do_reel_drive(void)
 		//if (reel_tension_is_on(reel))
 			reel_tension_off(reel);
 
+		if (test_control(CONTROL_STOP_LAMP))
+			return;
+
 		reel_drive_run();
 	}
 }

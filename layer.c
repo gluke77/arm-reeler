@@ -167,6 +167,8 @@ void do_layer(void)
 		layer_stop();
 		layer_forward();
 		gs_do_step = 1;
+
+		do_control();
 	}
 
 	if (layer_is_end() && layer_is_forward())
@@ -174,6 +176,8 @@ void do_layer(void)
 		layer_stop();
 		layer_backward();
 		gs_do_step = 1;
+		
+		do_control();
 	}
 
 	if ((!encoder_state && old_encoder_state) && gs_do_step)
@@ -184,6 +188,8 @@ void do_layer(void)
 		{
 			layer_stop();
 			gs_encoder_pulse_count = 0;
+			
+			do_control();
 		}
 	}
 	

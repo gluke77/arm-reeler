@@ -99,3 +99,13 @@ void stop_timer(int timer_id)
   if ((1 < timer_id) && (timer_id < TIMER_COUNT))
     timers[timer_id] = -1;
 }
+
+void timer_suspend(void)
+{
+	T0TCR = 0x00000000;
+}
+
+void timer_resume(void)
+{
+	T0TCR = 0x00000001;
+}

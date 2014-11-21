@@ -103,7 +103,7 @@ int main(void)
 		if (sensorfrm.isVisible())
 			sensorfrm.update();
 
-		_delay_ms(10);
+		//_delay_ms(10);
 
 		process_usart1();
 
@@ -218,7 +218,7 @@ void process_usart1(void)
 			old_emm_reel_A_state = 1;
 			reel_tension_on(REEL_A);
 		}
-		else
+		else if (1 == cmd.value[0] & 3)
 		{
 			old_emm_reel_A_state = 0;
 			reel_tension_off(REEL_A);
@@ -229,7 +229,7 @@ void process_usart1(void)
 			old_emm_reel_B_state = 1;
 			reel_tension_on(REEL_B);
 		}
-		else
+		else if (4 == cmd.value[0] & 12)
 		{
 			old_emm_reel_B_state = 0;
 			reel_tension_off(REEL_B);
@@ -341,9 +341,6 @@ void do_stop(void)
 	control_off(CONTROL_LEAVES_B_CLOSE);
 
 	reel_tension_off(REEL_A);
-	reel_tension_lamp_off(REEL_A);
-
 	reel_tension_off(REEL_B);
-	reel_tension_lamp_off(REEL_B);
 }
 

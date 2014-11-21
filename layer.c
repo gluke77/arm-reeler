@@ -57,22 +57,22 @@ void layer_stop(void)
 
 void layer_forward(void)
 {
-	control_on(CONTROL_LAYER_DIRECTION);
+	control_off(CONTROL_LAYER_DIRECTION);
 }
 
 void layer_backward(void)
 {
-	control_off(CONTROL_LAYER_DIRECTION);
+	control_on(CONTROL_LAYER_DIRECTION);
 }
 
 int layer_is_forward(void)
 {
-	return test_control(CONTROL_LAYER_DIRECTION);
+	return !test_control(CONTROL_LAYER_DIRECTION);
 }
 
 int layer_is_backward(void)
 {
-	return !test_control(CONTROL_LAYER_DIRECTION);
+	return test_control(CONTROL_LAYER_DIRECTION);
 }
 
 void layer_toggle_direction(void)

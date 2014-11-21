@@ -11,8 +11,8 @@
 #define REEL_B			(1)
 #define REEL_COUNT		(2)
 
-#define REEL_LEAVES_LAMP_BLINK_TIMEOUT	(100)
-#define REEL_LEAVES_OPEN_CLOSE_TIMEOUT	(100)
+#define REEL_LEAVES_LAMP_BLINK_TIMEOUT	(20)
+#define REEL_LEAVES_OPEN_CLOSE_TIMEOUT	(20)
 
 typedef struct
 {
@@ -83,20 +83,26 @@ void do_reel_drive(void)
 {
 	int reel = reel_get_selected();
 
-	if ((REEL_NONE == reel) && test_control(CONTROL_STOP_LAMP))
+	if (REEL_NONE == reel)
 	{
-		control_off(CONTROL_STOP_LAMP);
-	}
+		if (test_control(CONTROL_STOP_LAMP))
+			control_off(CONTROL_STOP_LAMP);
 	
-	if ((REEL_NONE == reel) && reel_drive_is_run())
-	{
-		reel_drive_stop();
-		reel_tension_off(REEL_A);
-		reel_tension_off(REEL_B);
-	}
+		if (reel_drive_is_run())
+		{
+			reel_drive_stop();
+			reel_tension_off(REEL_A);
+			reel_tension_off(REEL_B);
 
-	if ((REEL_NONE != reel) && reel_drive_is_stopped() && (reel_tension_is_off(reel) || reel_leaves_are_closed(reel)))
+		}
+	}
+	else if (reel_drive_is_stopped())
+	{
+		//if (reel_tension_is_on(reel))
+			reel_tension_off(reel);
+
 		reel_drive_run();
+	}
 }
 
 void reel_leaves_open(int reel)
@@ -250,7 +256,7 @@ void reel_leaves_lamp_blink_off(int reel)
 		return;
 
 	gs_reels[reel].leaves_lamp_is_blink = 0;	
-	reel_leaves_lamp_on(reel);
+	reel_leaves_lamp_off(reel);
 
 }
 
@@ -314,6 +320,9 @@ void reel_tension_on(int reel)
 	if ((REEL_A != reel) && (REEL_B != reel))
 		return;
 
+	if (reel_leaves_are_open(reel) || reel_drive_is_stopped() || (reel != reel_get_selected()))
+		return;
+	
 	gs_reels[reel].tension_state = 1;
 	reel_tension_lamp_on(reel);	
 /*
@@ -418,15 +427,9 @@ void do_reel_tension(int reel)
 		if (!button_state)
 		{
 			if (gs_reels[reel].tension_state)
-			{
 				reel_tension_off(reel);
-				reel_tension_lamp_off(reel);
-			}
- 			else
-			{
+			else if ((reel_get_selected() == reel) && reel_leaves_are_closed(reel))
 				reel_tension_on(reel);
-				reel_tension_lamp_on(reel);
-			}
 		}
 
 		gs_reels[reel].tension_button_prev_state = button_state;

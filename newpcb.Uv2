@@ -124,7 +124,7 @@ Options 1,0,0  // Target 'Target 1'
   OPTDBG 48125,-1,()()()()()()()()()() ()()()()
  FLASH1 { 2,0,0,0,1,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0 }
  FLASH2 (BIN\UL2ARM.DLL)
- FLASH3 ("C:\Program Files\Philips Flash Utility\LPC210x_ISP.exe" ("#H" ^X $D COM2: 115200 1))
+ FLASH3 ("C:\Program Files\Philips Flash Utility\LPC210x_ISP.exe" ("#H" ^X $D COM3: 115200 1))
  FLASH4 ()
 EndOpt
 

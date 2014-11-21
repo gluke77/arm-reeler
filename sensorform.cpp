@@ -37,6 +37,9 @@ void SensorForm::show()
 	layerEncoderLabel.show();
 	stopLabel.show();
 
+	layerPulseCount.show();
+	layerPulseRate.show();
+
 	update();
 }
 
@@ -63,6 +66,9 @@ void SensorForm::hide()
 
 	layerEncoderLabel.hide();
 	stopLabel.hide();
+
+	layerPulseCount.hide();
+	layerPulseRate.hide();
 
 	lcd_fill_text(' ');
 	lcd_set_layer(1, LCD_LAYER_ON);
@@ -95,6 +101,9 @@ void SensorForm::onMoveTo(int x, int y)
 
 }
 
+extern int g_layer_pulse_count;
+extern int g_layer_encoder_rate;
+
 void SensorForm::update()
 {
 	reelASelectedLabel.setValue(test_sensor(SENSOR_REEL_SELECTED_A));
@@ -114,5 +123,9 @@ void SensorForm::update()
 
 	layerEncoderLabel.setValue(test_sensor(SENSOR_LAYER_ENCODER));
 	stopLabel.setValue(test_sensor(SENSOR_STOP_BUTTON));
+
+	layerPulseCount.setValue(g_layer_pulse_count);
+	layerPulseRate.setValue(g_layer_encoder_rate);
+
 }
 

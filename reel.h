@@ -69,6 +69,8 @@ void do_reel(void);
 
 int reel_tusn_is_on(int /* reel */);
 void do_reel_turn(int /* reel */);
+int reel_turn_count(int /* reel */);
+
 
 #ifdef __cplusplus__
 }

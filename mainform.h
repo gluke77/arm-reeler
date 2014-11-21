@@ -33,6 +33,8 @@ public:
 	RoundButton moreButton;
 	RoundButton okButton;
 	RoundButton menuButton;
+	Label		reelCountLabel;
+	RoundFrame	reelCountFrame;
 
 	enum {SELECTED_NONE = 0, SELECTED_REEL_A, SELECTED_REEL_B, SELECTED_STEP};
 	int widgetSelected;
@@ -45,6 +47,7 @@ public:
 		reelARoundFrame(23, 41, 295, 85, 1), reelBRoundFrame(23, 89, 295, 133, 1),
 		reelALabel(5, 3, " ‡ÚÛ¯Í‡ ¿  %2.0f Í„ "), reelBLabel(5, 6, " ‡ÚÛ¯Í‡ ¡  %2.0f Í„ "),
 		stepLabel(5, 10, "ÿ¿√ ” À¿ƒ◊» ¿  %2.0f ÏÏ"), stepRoundFrame(15, 151, 303, 183, 3),
+		reelCountLabel(5, 13, " ¿“”ÿ ¿ ¿ %2.0f ¬»“ Œ¬"), reelCountFrame(15, 199, 239, 231, 3),
 		widgetSelected(SELECTED_NONE)
 	{
 		cancelButton.setOnRelease(onMainfrm_CancelButtonRelease);
@@ -66,6 +69,8 @@ public:
 
 	void showOtherButtons(int flag);
 	void doBlink();
+
+	void update();
 
 };
 

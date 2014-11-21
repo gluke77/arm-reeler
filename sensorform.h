@@ -34,6 +34,9 @@ public:
 	Label	layerEncoderLabel;
 	Label	stopLabel;
 
+	Label	layerPulseCount;
+	Label	layerPulseRate;
+
 	RoundButton menuButton;
 
 	SensorForm() : reelASelectedLabel(0, 0, "Выбрана катушка А %1.0f "), leavesAOpenLabel(0, 1, "Откр. лепестки А %1.0f "),
@@ -44,6 +47,7 @@ public:
 		turnBLabel(20,4, "Оборот катушки Б %1.0f "),
 		layerBeginLabel(0, 5, "Начало укл. %1.0f "), layerEndLabel(20, 5, "Конец укл. %1.0f "),
 		layerEncoderLabel(0, 6, "Энкодер укл. %1.0f "), stopLabel(20, 6, "Кнопка СТОП %1.0f "),
+		layerPulseCount(0, 7, "Имп. укл. %.0f "), layerPulseRate(20, 7, "Имп/с укл. %.0f "),
 		menuButton(255, 195, 303, 235, 33, 13, "МЕНЮ")
 	{
 		menuButton.setOnRelease(onSensorfrm_MenuButtonRelease);

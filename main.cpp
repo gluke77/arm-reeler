@@ -27,9 +27,7 @@
 
 char buf[200];
 
-int msec_begin;
-int msec_end;
-
+int g_layer_encoder_rate;
 //void process_usart0(void);
 void process_usart1(void);
 
@@ -37,6 +35,7 @@ void do_touch(void);
 void touch_pressed(int, int);
 void touch_released(int, int);
 void do_stop(void);
+void calculate_encoder_rate(void);
 
 #define TIMER_TIMEOUT (10)
 
@@ -115,6 +114,10 @@ int main(void)
 				mainfrm.doBlink();
 		}
 
+		if (mainfrm.isVisible())
+			mainfrm.update();
+
+
 		do_touch();
 
 		if (!controlfrm.isVisible())
@@ -130,6 +133,8 @@ int main(void)
 		//sprintf(buf, "2nd duration = %d, msecs = %d\n", msec_end - msec_begin, msec_end);
 		//usart0_puts(buf);
 
+
+		calculate_encoder_rate();
 	}
 }
 /*
@@ -368,4 +373,22 @@ void do_stop(void)
 
 	do_control();
 }
+
+void calculate_encoder_rate(void)
+{
+	static int msecs = 0;
+	static int pulse_count = 0;
+
+	int new_msecs;
+	int new_pcount;
+
+	new_msecs = timer_mseconds_total;
+	new_pcount = g_layer_pulse_count;
+
+	g_layer_encoder_rate = (new_pcount - pulse_count) * 1000 / (new_msecs - msecs);
+
+	msecs = new_msecs;
+	pulse_count = new_pcount;
+}
+
 

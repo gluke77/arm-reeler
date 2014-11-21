@@ -594,12 +594,12 @@ void lcd_fill_round_rect(int left, int top, int rite, int bottom, char brush, in
 		lcd_fill_rect(left, top, rite, bottom, brush, layer);
 	else
 	{
-		lcd_hor_line(left + 2, top, rite - 2, brush, layer);
-		lcd_hor_line(left + 2, bottom, rite - 2, brush, layer);
-		lcd_hor_line(left + 1, top + 1, rite - 1, brush, layer);
-		lcd_hor_line(left + 1, bottom -1, rite - 1, brush, layer);
+		lcd_hor_line(left + 2, top, rite - 1, brush, layer);
+		lcd_hor_line(left + 2, bottom, rite - 1, brush, layer);
+		lcd_hor_line(left + 1, top + 1, rite, brush, layer);
+		lcd_hor_line(left + 1, bottom -1, rite, brush, layer);
 
 		for (i = top + 2; i < bottom - 1; i++)
-			lcd_hor_line(left, i, rite, brush, layer);
+			lcd_hor_line(left, i, rite + 1, brush, layer);
 	}
 }

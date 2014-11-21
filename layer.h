@@ -31,6 +31,7 @@ void layer_init(void);
 
 void do_layer(void);
 
+extern int g_layer_pulse_count;
 
 #ifdef __cplusplus__
 }

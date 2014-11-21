@@ -9,6 +9,8 @@
 static int gs_encoder_pulse_count = 0;
 static int gs_do_step = 1;
 
+int	g_layer_pulse_count;
+
 void layer_init(void)
 {
 	layer_stop();
@@ -110,6 +112,10 @@ void do_layer(void)
 	int			encoder_state = 0;
 
 	encoder_state = test_sensor(SENSOR_LAYER_ENCODER);
+
+	if (!encoder_state && old_encoder_state)
+		g_layer_pulse_count++;
+
 	
 	if (layer_is_stop())
 	{

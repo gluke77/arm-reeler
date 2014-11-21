@@ -669,6 +669,14 @@ void do_reel_turn(int reel)
 	gs_reels[reel].turn_prev_state = turn_state;
 }
 
+int reel_turn_count(int reel)
+{
+	if ((REEL_A != reel) && (REEL_B != reel))
+		return 0;
+
+	return gs_reels[reel].turn_count;	
+}
+
 void do_reel(void)
 {
 	do_reel_drive();

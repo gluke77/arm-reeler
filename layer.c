@@ -37,11 +37,14 @@ void layer_init(void)
 
 	layer_stop();
 	layer_forward();
-	layer_goto_begin();
+	//layer_goto_begin();
 }
 
 void layer_run(void)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	gs_encoder_pulse_count = 0;
 	control_on(CONTROL_LAYER_DRIVE);
 }
@@ -92,6 +95,9 @@ int layer_is_end(void)
 
 void layer_goto_begin(void)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if (layer_is_begin())
 		return;
 	
@@ -101,6 +107,9 @@ void layer_goto_begin(void)
 }
 void layer_goto_end(void)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if (layer_is_end())
 		return;
 

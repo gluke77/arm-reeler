@@ -32,6 +32,7 @@ void process_usart1(void);
 void do_touch(void);
 void touch_pressed(int, int);
 void touch_released(int, int);
+void do_stop(void);
 
 extern "C" void do_timer(void)
 {
@@ -92,9 +93,12 @@ int main(void)
 		
 		if (!controlfrm.isVisible())
 		{
-			do_layer();
 			do_reel();
 		}
+		
+		do_layer();
+
+		do_stop();
 
 		if (sensorfrm.isVisible())
 			sensorfrm.update();
@@ -321,5 +325,25 @@ void touch_released(int x, int y)
 {
 }
 
+void do_stop(void)
+{
+	if (!test_sensor(SENSOR_STOP_BUTTON))
+		return;
 
+	control_on(CONTROL_STOP_LAMP);
+
+	layer_stop();
+	reel_drive_stop();
+	
+	control_off(CONTROL_LEAVES_A_OPEN);
+	control_off(CONTROL_LEAVES_A_CLOSE);
+	control_off(CONTROL_LEAVES_B_OPEN);
+	control_off(CONTROL_LEAVES_B_CLOSE);
+
+	reel_tension_off(REEL_A);
+	reel_tension_lamp_off(REEL_A);
+
+	reel_tension_off(REEL_B);
+	reel_tension_lamp_off(REEL_B);
+}
 

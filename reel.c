@@ -58,6 +58,9 @@ int reel_get_selected(void)
 
 void reel_drive_run(void)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	control_on(CONTROL_REEL_DRIVE);
 }
 
@@ -80,6 +83,11 @@ void do_reel_drive(void)
 {
 	int reel = reel_get_selected();
 
+	if ((REEL_NONE == reel) && test_control(CONTROL_STOP_LAMP))
+	{
+		control_off(CONTROL_STOP_LAMP);
+	}
+	
 	if ((REEL_NONE == reel) && reel_drive_is_run())
 	{
 		reel_drive_stop();
@@ -93,6 +101,9 @@ void do_reel_drive(void)
 
 void reel_leaves_open(int reel)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if ((REEL_A != reel) && (REEL_B != reel))
 		return;
 
@@ -120,12 +131,17 @@ void reel_leaves_open(int reel)
 
 void reel_leaves_close(int reel)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if ((REEL_A != reel) && (REEL_B != reel))
 		return;
 
 	gs_reels[reel].leaves_state = 0;
 	reel_leaves_lamp_blink_off(reel);
 
+	gs_reels[reel].leaves_open_close_timeout = REEL_LEAVES_OPEN_CLOSE_TIMEOUT;
+	
 	if (REEL_A == reel)
 	{
 		if (test_control(CONTROL_LEAVES_A_OPEN))
@@ -248,6 +264,9 @@ int reel_leaves_lamp_is_blink(int reel)
 
 void do_reel_leaves(int reel)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if (reel_leaves_open_button_is_pressed(reel) && reel_leaves_are_closed(reel) && reel_is_stopped(reel))
 	{
 		reel_leaves_open(reel);
@@ -289,6 +308,9 @@ int reel_is_stopped(int reel)
 
 void reel_tension_on(int reel)
 {
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if ((REEL_A != reel) && (REEL_B != reel))
 		return;
 
@@ -383,6 +405,9 @@ void do_reel_tension(int reel)
 {
 	int button_state;
 
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
 	if ((REEL_A != reel) && (REEL_B != reel))
 		return;
 
@@ -449,6 +474,9 @@ void do_reel_leaves_open_close(int reel)
 		gs_reels[reel].leaves_open_close_timeout--;
 		return;	
 	}
+
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
 
 	if (REEL_A == reel)
 	{

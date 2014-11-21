@@ -1,17 +1,7 @@
 #include "layer.h"
 #include "sensor.h"
 #include "control.h"
-
-
-typedef struct
-{
-	int	step;
-	int encoder_pulse_count;
-} layer_settings_s;
-
-static layer_settings_s	gs_layer_settings[LAYER_SETTINGS_COUNT];
-
-static int gs_layer_settings_id = 0;
+#include "tube.h"
 
 #define LAYER_DIRECTION_FORWARD		(0)
 #define LAYER_DIRECTION_BACKWARD	(1)
@@ -21,20 +11,6 @@ static int gs_do_step = 1;
 
 void layer_init(void)
 {
-	gs_layer_settings_id = 0;
-
-	gs_layer_settings[0].step = 16;
-	gs_layer_settings[0].encoder_pulse_count = 4;
-
-	gs_layer_settings[1].step = 20;
-	gs_layer_settings[1].encoder_pulse_count = 5;
-
-	gs_layer_settings[2].step = 26;
-	gs_layer_settings[2].encoder_pulse_count = 7;
-
-	gs_layer_settings[3].step = 32;
-	gs_layer_settings[3].encoder_pulse_count = 8;
-
 	layer_stop();
 	layer_forward();
 	//layer_goto_begin();
@@ -118,27 +94,6 @@ void layer_goto_end(void)
 	layer_run();
 }
 
-void layer_set_settings_id(int id)
-{
-	if ((0 <= id) || (id < LAYER_SETTINGS_COUNT))
-		gs_layer_settings_id = id;
-}
-
-int layer_get_settings_id(void)
-{
-	return gs_layer_settings_id;
-}
-
-int layer_get_step(void)
-{
-	return gs_layer_settings[gs_layer_settings_id].step;
-}
-
-int layer_get_max_pulse_count(void)
-{
-	return gs_layer_settings[gs_layer_settings_id].encoder_pulse_count;
-}
-
 int layer_is_run(void)
 {
 	return test_control(CONTROL_LAYER_DRIVE);
@@ -184,7 +139,7 @@ void do_layer(void)
 	{
 		gs_encoder_pulse_count++;
 		
-		if (gs_encoder_pulse_count > layer_get_max_pulse_count())
+		if (gs_encoder_pulse_count > tube_get_max_layer_pulse_count())
 		{
 			layer_stop();
 			gs_encoder_pulse_count = 0;
@@ -196,10 +151,4 @@ void do_layer(void)
 	old_encoder_state = encoder_state;
 }
 
-int layer_get_step_by_id(int id)
-{
-	if ((id < 0) || (id >= LAYER_SETTINGS_COUNT))
-		return 0;
 
-	return gs_layer_settings[id].step;
-}

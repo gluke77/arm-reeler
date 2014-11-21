@@ -12,8 +12,6 @@ extern "C" {
 #define REEL_B			(1)
 #define REEL_COUNT		(2)
 
-#define REEL_LEAVES_LAMP_BLINK_TIMEOUT	(100)
-
 void reel_init(void);
 int reel_get_selected(void);
 
@@ -38,6 +36,7 @@ void reel_leaves_lamp_on(int /* reel */);
 void reel_leaves_lamp_off(int /* reel */);
 int reel_leaves_lamp_is_on(int /* reel */);
 int reel_leaves_lamp_is_off(int /* reel */);
+void reel_leaves_lamp_short_blink_on(int /* reel */);
 void reel_leaves_lamp_blink_on(int /* reel */);
 void reel_leaves_lamp_blink_off(int /* reel */);
 int reel_leaves_lamp_is_blink(int /* reel */);
@@ -54,7 +53,14 @@ int reel_tension_button_is_pressed(int /* reel */);
 void reel_tension_lamp_on(int /* reel */);
 void reel_tension_lamp_off(int /* reel */);
 
+int reel_tension_lamp_is_on(int /* reel */);
+int reel_tension_lamp_is_off(int /* reel */);
+
 void do_reel_tension(int /* reel */);
+
+void do_reel_tension_lamp_blink(int /* reel */);
+void reel_tension_lamp_blink_on(int /* reel */);
+void reel_tension_lamp_blink_off(int /* reel */);
 
 int reel_tension_get_value(int /* reel */);
 void reel_tension_set_value(int reel, int value);

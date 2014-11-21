@@ -27,13 +27,6 @@ int layer_is_end(void);
 void layer_goto_begin(void);
 void layer_goto_end(void);
 
-void layer_set_settings_id(int /* id */);
-int layer_get_settings_id(void);
-int layer_get_step(void);
-int layer_get_max_pulse_count(void);
-
-int layer_get_step_by_id(int /* id */);
-
 void layer_init(void);
 
 void do_layer(void);

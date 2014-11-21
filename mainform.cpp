@@ -5,6 +5,7 @@
 #include "layer.h"
 #include "emm.h"
 #include "reel.h"
+#include "tube.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +14,7 @@ extern char	buf[50];
 
 MainForm mainfrm;
 
-static int gs_layer_settings_id = 0;
+static int gs_tube_settings_id = 0;
 static int gs_old_reelA_kg = 0;
 static int gs_old_reelB_kg = 0;
 
@@ -44,8 +45,8 @@ void onMainfrm_MoreButtonRelease()
 		break;
 	
 	case MainForm::SELECTED_STEP:
-		if (gs_layer_settings_id < LAYER_SETTINGS_COUNT - 1)
-			mainfrm.stepLabel.setValue(layer_get_step_by_id(++gs_layer_settings_id));
+		if (gs_tube_settings_id < TUBE_SETTINGS_COUNT - 1)
+			mainfrm.stepLabel.setValue(tube_get_step_by_id(++gs_tube_settings_id));
 		break;
 
 	default:
@@ -74,8 +75,8 @@ void onMainfrm_LessButtonRelease()
 		break;
 	
 	case MainForm::SELECTED_STEP:
-		if (gs_layer_settings_id > 0)
-			mainfrm.stepLabel.setValue(layer_get_step_by_id(--gs_layer_settings_id));
+		if (gs_tube_settings_id > 0)
+			mainfrm.stepLabel.setValue(tube_get_step_by_id(--gs_tube_settings_id));
 		break;
 
 	default:
@@ -88,7 +89,7 @@ void onMainfrm_CancelButtonRelease()
 	switch (mainfrm.widgetSelected)
 	{
 	case MainForm::SELECTED_STEP:
-		mainfrm.stepLabel.setValue(layer_get_step());
+		mainfrm.stepLabel.setValue(tube_get_step());
 		break;
 
 	case MainForm::SELECTED_REEL_A:
@@ -114,8 +115,8 @@ void onMainfrm_OkButtonRelease()
 	switch (mainfrm.widgetSelected)
 	{
 	case MainForm::SELECTED_STEP:
-		layer_set_settings_id(gs_layer_settings_id);
-		mainfrm.stepLabel.setValue(layer_get_step());
+		tube_set_settings_id(gs_tube_settings_id);
+		mainfrm.stepLabel.setValue(tube_get_step());
 		break;
 	
 	case MainForm::SELECTED_REEL_A:
@@ -167,7 +168,7 @@ void MainForm::show()
 	lcd_puts("–≈√”À»–Œ¬ ¿ Õ¿“ﬂ∆≈Õ»ﬂ");
 
 
-	stepLabel.setValue(layer_get_step());
+	stepLabel.setValue(tube_get_step());
 
 
 	menuButton.show();
@@ -264,7 +265,7 @@ void MainForm::onPress(int x, int y)
 		else if (stepRoundFrame.hasPoint(x, y))
 		{
 			widgetSelected = SELECTED_STEP;
-			gs_layer_settings_id = layer_get_settings_id();
+			gs_tube_settings_id = tube_get_settings_id();
 			showOtherButtons(1);
 		}
 	}

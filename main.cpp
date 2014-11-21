@@ -15,6 +15,7 @@
 #include "layer.h"
 #include "reel.h"
 #include "emm.h"
+#include "tube.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -61,6 +62,7 @@ int main(void)
 	uint8_t blink_timer_id = 0;
 
 	rtc_init();
+	tube_init();
 	control_init();
 	beep_init();
 
@@ -71,6 +73,10 @@ int main(void)
 	lcd_init();
 	sensor_init();
 	touch_init();
+
+	if (REEL_NONE != reel_get_selected())
+		control_on(CONTROL_STOP_LAMP);
+
 	timer_init();
 
 	layer_init();

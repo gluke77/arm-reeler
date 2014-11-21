@@ -36,6 +36,7 @@ File 1,1,<.\control.c><control.c>
 File 1,8,<.\sensorform.cpp><sensorform.cpp>
 File 1,8,<.\togglebutton.cpp><togglebutton.cpp>
 File 1,8,<.\controlform.cpp><controlform.cpp>
+File 1,1,<.\tube.c><tube.c>
 
 
 Options 1,0,0  // Target 'Target 1'

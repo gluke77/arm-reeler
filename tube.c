@@ -17,22 +17,22 @@ void tube_init(void)
 	gs_tube_settings_id = 0;
 
 	gs_tube_settings[0].step = 16;
-	gs_tube_settings[0].layer_pulse_count = 4;
+	gs_tube_settings[0].layer_pulse_count = 800;
 	gs_tube_settings[0].reel_max_turn_count = 20;
 	gs_tube_settings[0].reel_warn_turn_count = 15;
 
 	gs_tube_settings[1].step = 20;
-	gs_tube_settings[1].layer_pulse_count = 5;
+	gs_tube_settings[1].layer_pulse_count = 1000;
 	gs_tube_settings[1].reel_max_turn_count = 20;
 	gs_tube_settings[1].reel_warn_turn_count = 15;
 
 	gs_tube_settings[2].step = 26;
-	gs_tube_settings[2].layer_pulse_count = 7;
+	gs_tube_settings[2].layer_pulse_count = 1300;
 	gs_tube_settings[2].reel_max_turn_count = 20;
 	gs_tube_settings[2].reel_warn_turn_count = 15;
 
 	gs_tube_settings[3].step = 32;
-	gs_tube_settings[3].layer_pulse_count = 8;
+	gs_tube_settings[3].layer_pulse_count = 1600;
 	gs_tube_settings[3].reel_max_turn_count = 20;
 	gs_tube_settings[3].reel_warn_turn_count = 15;
 }

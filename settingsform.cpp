@@ -486,7 +486,7 @@ void SettingsForm::onPress(int x, int y)
 		}
 		else if (invertorWriteAddrFrame.hasPoint(x, y))
 		{
-			widgetSelected = SELECTED_READ;
+			widgetSelected = SELECTED_WRITE;
 			g_invertor_write_addr = invertorWriteAddrLabel.getValue();
 			showOtherButtons(1);
 		}

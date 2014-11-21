@@ -1240,8 +1240,8 @@ void reset_settings(void)
 	g_usart1_baudrate = 19200;
 
 	g_invertor_speed = 3000;
-	g_invertor_read_addr = 0x2000;
-	g_invertor_write_addr = 0x2000;
+	g_invertor_read_addr = 0x2102;
+	g_invertor_write_addr = 0x2001;
 
 
 	reel_tension_set_value(REEL_A, kg2emm(40));

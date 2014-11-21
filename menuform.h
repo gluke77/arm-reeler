@@ -14,6 +14,10 @@ void onMenufrm_LayerButtonRelease();
 void onMenufrm_CaliberRelease();
 void onMenufrm_FastRelease();
 
+void onMenufrm_ResetRelease();
+void onMenufrm_LoadRelease();
+void onMenufrm_SaveRelease();
+
 class MenuForm: public Form
 {
 
@@ -25,16 +29,27 @@ public:
 	RoundButton caliberButton;
 	RoundButton fastButton;
 
-	MenuForm() : mainButton(11, 6, 303, 40, 14, 1, "пюанвхи щйпюм"), rsButton(13, 54, 303, 88, 11, 4, "мюярпнийю хмбепрнпю"),
-		layerButton(15, 102, 303, 136, 11, 7, "мюярпнийю сйкюдвхйю"), caliberButton(15, 150, 152, 184, 8, 10, "бшундш"),
-		fastButton(166, 150, 303, 184, 27 /*13*/, 10, "бундш" /*"ашярпюъ ялнрйю"*/)
-		//fastButton(15, 198, 303, 232, 17 /*13*/, 13, "бундш" /*"ашярпюъ ялнрйю"*/)
+	RoundButton	resetButton;
+	RoundButton	loadButton;
+	RoundButton	saveButton;
+
+	MenuForm() : mainButton(15, 6, 303, 40, 14, 1, "пюанвхи щйпюм"), rsButton(15, 54, 303, 88, 11, 4, "мюярпнийю оюпюлерпнб"),
+		layerButton(15, 102, 303, 136, 12, 7, "мюярпнийю опнтхкъ"), caliberButton(15, 150, 155, 184, 8, 10, "бшундш"),
+		fastButton(163, 150, 303, 184, 26, 10, "бундш"),
+		resetButton(15, 198, 103, 232, 5, 13, "яапня"),
+		loadButton(111, 198, 207, 232, 15, 13, "гюцпсгхрэ"),
+		saveButton(215, 198, 303, 232, 28, 13, "янупюмхрэ")
 	{
 		mainButton.setOnRelease(onMenufrm_MainButtonRelease);
 		rsButton.setOnRelease(onMenufrm_RsButtonRelease);
 		layerButton.setOnRelease(onMenufrm_LayerButtonRelease);
 		caliberButton.setOnRelease(onMenufrm_CaliberRelease);
 		fastButton.setOnRelease(onMenufrm_FastRelease);
+
+		resetButton.setOnRelease(onMenufrm_ResetRelease);
+		loadButton.setOnRelease(onMenufrm_LoadRelease);
+		saveButton.setOnRelease(onMenufrm_SaveRelease);
+
 	}
 
 	virtual void setVisible(int v);

@@ -27,18 +27,34 @@
 #include "sensorform.h"
 #include "controlform.h"
 #include "profileform.h"
+#include "settingsform.h"
+//#include "yesnoform.h"
 
 char buf[200];
 
 int g_layer_encoder_rate;
 
-int g_modbus_id = 1;
+int	g_my_id;
+int	g_emm_id;
+int	g_invertor_id;
+
+int	g_emm_connected;
+int	g_invertor_connected;
+
+int g_emm_error;
+int g_invertor_error;
+
+int g_usart0_baudrate;
+int	g_usart1_baudrate;
+
+int	g_invertor_read_addr;
+int g_invertor_write_addr;
 int g_invertor_speed;
 
 void process_usart0(void);
 void process_usart1(void);
-void process_emm(void);
-void process_invertor(void);
+int process_emm(void);
+int process_invertor(void);
 
 void do_touch(void);
 void touch_pressed(int, int);
@@ -51,8 +67,6 @@ void load_settings(void);
 int save_settings(void);
 
 #define TIMER_TIMEOUT (10)
-
-
 
 extern "C" void do_timer(void)
 {
@@ -75,6 +89,7 @@ int main(void)
 	volatile int   i = 0;
 	uint8_t blink_timer_id = 0;
 
+//	reset_settings();
 	load_settings();
 
 	rtc_init();
@@ -82,8 +97,8 @@ int main(void)
 	control_init();
 	beep_init();
 
-	usart0_init(USART_RS485_SLAVE | USART_INT_ENABLE, 19200);
-	usart1_init(USART_RS485_MASTER| USART_INT_ENABLE, 19200);
+	usart0_init(USART_RS485_SLAVE | USART_INT_ENABLE, g_usart0_baudrate);
+	usart1_init(USART_RS485_MASTER| USART_INT_ENABLE, g_usart1_baudrate);
 
 	lcd_init();
 	sensor_init();
@@ -119,7 +134,7 @@ int main(void)
 	while (1)
 	{
 		if (0 == blink_timer_id)
-			blink_timer_id = start_timer(250);
+			blink_timer_id = start_timer(300);
 
 		if (0 == timer_value(blink_timer_id))
 		{
@@ -130,10 +145,19 @@ int main(void)
 
 			if (profilefrm.isVisible())
 				profilefrm.doBlink();
+	
+			if (settingsfrm.isVisible())
+				settingsfrm.doBlink();
 		}
 
 		if (mainfrm.isVisible())
 			mainfrm.update();
+
+		if (settingsfrm.isVisible())
+			settingsfrm.update();
+
+		if (sensorfrm.isVisible())
+			sensorfrm.update();
 
 
 		do_touch();
@@ -144,8 +168,6 @@ int main(void)
 			do_reel();
 		}
 
-		if (sensorfrm.isVisible())
-			sensorfrm.update();
 
 		process_usart0();
 		process_usart1();
@@ -172,7 +194,7 @@ void process_usart0(void)
 	res = modbus_msg2cmd((const char *)usart0_inbuf, &cmd);
 
 	if (RESULT_OK == res)
-		if (g_modbus_id == cmd.device_id)
+		if (g_my_id == cmd.device_id)
 		{
 			if (MODBUS_WRITE == cmd.cmd_code)
 			{
@@ -311,9 +333,40 @@ void process_usart0(void)
 						else
 							reel_tension_lamp_blink_on(REEL_B);
 					}
+					
+					if (value & 1 << 8)
+						g_emm_connected = 0;
 
+					if (value & 1 << 9)
+						g_emm_connected = 1;
+
+					if (value & 1 << 10)
+						g_invertor_connected = 0;
+
+					if (value & 1 << 11)
+						g_invertor_connected = 1;
 
 					break;					
+				
+				case 0x0006:
+					g_usart1_baudrate = value * 100;	
+					break;
+
+				case 0x0007:
+					g_emm_id = value;	
+					break;
+
+				case 0x0008:
+					g_invertor_id = value;	
+					break;
+
+				case 0x0009:
+					g_invertor_read_addr = value;	
+					break;
+
+				case 0x00010:
+					g_invertor_write_addr = value;	
+					break;
 
 				case 0x0100:
 					if (value > 99)
@@ -676,6 +729,9 @@ void process_usart0(void)
 
 						if (profilefrm.isVisible())
 							profilefrm.show();
+
+						if (settingsfrm.isVisible())
+							settingsfrm.show();
 					}
 					else if (0xA55A == value)
 						cmd.value[0] = save_settings();
@@ -691,7 +747,7 @@ void process_usart0(void)
  					break;
 				}
 
-				cmd.device_id = g_modbus_id;
+				cmd.device_id = g_my_id;
 				cmd.cmd_code = MODBUS_WRITE;
 				cmd.cmd_type = MODBUS_ACK;
 
@@ -700,7 +756,7 @@ void process_usart0(void)
 			}
 			else if (MODBUS_READ == cmd.cmd_code)
 			{
-				cmd.device_id = g_modbus_id;
+				cmd.device_id = g_my_id;
 				cmd.cmd_code = MODBUS_READ;
 				cmd.cmd_type = MODBUS_ACK;
 
@@ -735,26 +791,26 @@ void process_usart0(void)
 						SETBIT(value, i);			 
 
 					i++;
-					if (test_control(CONTROL_STOP_LAMP))
-						SETBIT(value, i);			 
-						
-					i++;
 					SETBITS(value, get_siren_mode() << i);
 
 					i += 2;
+					if (g_emm_connected)
+						SETBIT(value, i);
 
+					i++;
+					if (g_invertor_connected)
+						SETBIT(value, i);
+
+					i++;
+					if (g_emm_error)
+						SETBIT(value, i);
+
+					i++;
+					if (g_invertor_error)
+						SETBIT(value, i);
 
 					cmd.value[cmd.addr++] = value;
 
-				}
-				else if (0x0001 == cmd.addr)
-				{
-					cmd.addr = 0;
-
-					cmd.value[cmd.addr++] = tube_get_step_by_id(0);
-					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(0);
-					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(0);
-					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(0);
 				}
 				else if (0x0001 == cmd.addr)
 				{
@@ -792,6 +848,17 @@ void process_usart0(void)
 					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(3);
 					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(3);
 				}
+				else if (0x0005 == cmd.addr)
+				{
+					cmd.addr = 0;
+
+					cmd.value[cmd.addr++] = g_usart1_baudrate / 100;
+					cmd.value[cmd.addr++] = g_emm_id;
+					cmd.value[cmd.addr++] = g_invertor_id;
+					cmd.value[cmd.addr++] = g_invertor_read_addr;
+					cmd.value[cmd.addr++] = g_invertor_write_addr;
+
+				}
 				else
 				{
 					cmd.addr = 1;
@@ -810,32 +877,34 @@ void process_usart1(void)
 
 	if (next)
 	{
-		process_emm();
+		g_emm_error = process_emm();
 		next = 0;
 	}
 	else
 	{
-		//process_invertor();
+		g_invertor_error = process_invertor();
 		next = 1;
 	}
 }
 
-void process_invertor(void)
+int process_invertor(void)
 {
-	static int g_invertor_device_id = 0;
 	static int old_invertor_speed = 0;
 
 	char			msg[MODBUS_MAX_MSG_LENGTH];
 	modbus_cmd_s	cmd;
 	result_e		res;
 
+	if (!g_invertor_connected)
+		return RESULT_OK;
+
 	cmd.cmd_type = MODBUS_REQ;
-	cmd.device_id = g_invertor_device_id;
-	cmd.addr = 0;	
+	cmd.device_id = g_invertor_id;
 
 	if (old_invertor_speed != g_invertor_speed)
 	{
 		cmd.cmd_code = MODBUS_WRITE;
+		cmd.addr = g_invertor_write_addr;	
 		cmd.value[0] = g_invertor_speed;
 		old_invertor_speed = g_invertor_speed;
 	}
@@ -843,6 +912,7 @@ void process_invertor(void)
 	{
 		cmd.cmd_code = MODBUS_READ;
 		cmd.value[0] = 1;
+		cmd.addr = g_invertor_read_addr;	
 	}
 
 	modbus_cmd2msg(&cmd, msg, MODBUS_MAX_MSG_LENGTH);
@@ -851,26 +921,26 @@ void process_invertor(void)
 	res = usart1_cmd(msg, msg, MODBUS_MAX_MSG_LENGTH, 300);
 	
 	if (RESULT_OK != res)
-		return;
+		return res;
 	
 	res = modbus_msg2cmd(msg, &cmd);
 
 	if (RESULT_OK != res)
-		return;
+		return res;
 
-	if (g_invertor_device_id == cmd.device_id && 
+	if (g_invertor_id == cmd.device_id && 
 		MODBUS_READ == cmd.cmd_code &&
 		MODBUS_ACK == cmd.cmd_type)
 	{
 		old_invertor_speed = cmd.value[0];
-		// process_invertor ack here
+		g_invertor_speed = cmd.value[0];
 	}
+
+	return RESULT_OK;
 }
 
-void process_emm(void)
+int process_emm(void)
 {
-	static int g_emm_device_id = 0;
-
 	static int old_emm_reel_A_state = 0;
 	static int old_emm_reel_B_state = 0;
 	static int old_emm_reel_A_value = 0;
@@ -880,7 +950,10 @@ void process_emm(void)
 	modbus_cmd_s	cmd;
 	result_e		res;
 
-	cmd.device_id = g_emm_device_id;
+	if (!g_emm_connected)
+		return RESULT_OK;
+
+	cmd.device_id = g_emm_id;
 	cmd.cmd_code = MODBUS_WRITE;
 	cmd.cmd_type = MODBUS_REQ;
 
@@ -935,14 +1008,14 @@ void process_emm(void)
 	res = usart1_cmd(msg, msg, MODBUS_MAX_MSG_LENGTH, 300);
 	
 	if (RESULT_OK != res)
-		return;
+		return res;
 	
 	res = modbus_msg2cmd(msg, &cmd);
 
 	if (RESULT_OK != res)
-		return;
+		return res;
 
-	if (g_emm_device_id == cmd.device_id && 
+	if (g_emm_id == cmd.device_id && 
 		MODBUS_READ == cmd.cmd_code &&
 		MODBUS_ACK == cmd.cmd_type)
 	{
@@ -1006,9 +1079,9 @@ void process_emm(void)
 				mainfrm.reelBLabel.setValue(mainfrm.reelBProgressBar.getValue());
 			}
 		}
-
-
 	}
+
+	return RESULT_OK;
 }
 
 void do_touch(void)
@@ -1033,6 +1106,11 @@ void do_touch(void)
 			controlfrm.onRelease(old_x, old_y);
 		else if (profilefrm.isVisible())
 			profilefrm.onRelease(old_x, old_y);
+ 		else if (settingsfrm.isVisible())
+			settingsfrm.onRelease(old_x, old_y);
+// 		else if (yesnofrm.isVisible())
+//			yesnofrm.onRelease(old_x, old_y);
+
 
 	}
 
@@ -1048,6 +1126,12 @@ void do_touch(void)
 			controlfrm.onPress(x, y);
 		else if (profilefrm.isVisible())
 			profilefrm.onPress(x, y);
+		else if (settingsfrm.isVisible())
+			settingsfrm.onPress(x, y);
+//		else if (yesnofrm.isVisible())
+//			yesnofrm.onPress(x, y);
+
+
 	}
 
 	old_x = x;
@@ -1125,7 +1209,20 @@ void reset_settings(void)
 	tube_set_warn_turn_count_by_id(3, 15);
 	tube_set_max_turn_count_by_id(3, 20);
 
+	g_my_id = 1;
+	g_emm_id = 0;
+	g_invertor_id = 1;
+
+	g_emm_connected = 1;
+	g_invertor_connected = 1;
+
+	g_usart0_baudrate = 19200;
+	g_usart1_baudrate = 19200;
+
 	g_invertor_speed = 3000;
+	g_invertor_read_addr = 0x2000;
+	g_invertor_write_addr = 0x2000;
+
 
 	reel_tension_set_value(REEL_A, kg2emm(40));
 	reel_tension_set_value(REEL_B, kg2emm(40));
@@ -1158,7 +1255,19 @@ void load_settings(void)
 	tube_set_warn_turn_count_by_id(3, *i++);
 	tube_set_max_turn_count_by_id(3, *i++);
 
+	g_my_id = *i++;
+	g_emm_id = *i++;
+	g_invertor_id = *i++;
+
+	g_emm_connected = *i++;
+	g_invertor_connected = *i++;
+
+	g_usart0_baudrate = *i++;
+	g_usart1_baudrate = *i++;
+
 	g_invertor_speed = *i++;
+	g_invertor_read_addr = *i++;
+	g_invertor_write_addr = *i++;
 
 	reel_tension_set_value(REEL_A, *i++);
 	reel_tension_set_value(REEL_B, *i++);
@@ -1191,7 +1300,19 @@ int save_settings(void)
 	settings[i++] = tube_get_warn_turn_count_by_id(3);
 	settings[i++] = tube_get_max_turn_count_by_id(3);
 
+	settings[i++] = g_my_id;
+	settings[i++] = g_emm_id;
+	settings[i++] = g_invertor_id;
+
+	settings[i++] = g_emm_connected;
+	settings[i++] = g_invertor_connected;
+
+	settings[i++] = g_usart0_baudrate;
+	settings[i++] = g_usart1_baudrate;
+
 	settings[i++] = g_invertor_speed;
+	settings[i++] = g_invertor_read_addr;
+	settings[i++] = g_invertor_write_addr;
 
 	settings[i++] = reel_tension_get_value(REEL_A);
 	settings[i++] = reel_tension_get_value(REEL_B);

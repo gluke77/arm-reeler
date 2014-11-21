@@ -40,6 +40,7 @@ File 1,1,<.\tube.c><tube.c>
 File 1,1,<.\siren.c><siren.c>
 File 1,1,<.\iap.c><iap.c>
 File 1,8,<.\profileform.cpp><profileform.cpp>
+File 1,8,<.\settingsform.cpp><settingsform.cpp>
 
 
 Options 1,0,0  // Target 'Target 1'
@@ -94,7 +95,7 @@ Options 1,0,0  // Target 'Target 1'
  OCMADSIRAM { 0,0,0,0,64,0,64,0,0 }
  OCMADSIROM { 1,0,0,0,0,0,0,4,0 }
  OCMADSXRAM { 0,0,0,0,0,0,0,0,0 }
- OCR_RVCT { 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,64,0,64,0,0,0,0,0,0,0,0,0,0,0 }
+ OCR_RVCT { 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,192,3,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,64,0,64,0,0,0,0,0,0,0,0,0,0,0 }
  RV_STAVEC ()
  ADSCCFLG { 5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
  ADSCMISC ()
@@ -337,6 +338,23 @@ Options 1,1,31  // File 'controlform.cpp'
 EndOpt
 
 Options 1,1,35  // File 'profileform.cpp'
+ PropFld { 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ ADSCCFLG { 2,84,85,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ADSCMISC ()
+ ADSCDEFN (__cplusplus__)
+ ADSCUDEF ()
+ ADSCINCD ()
+EndOpt
+
+Options 1,1,36  // File 'settingsform.cpp'
  PropFld { 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
  IncBld=2
  AlwaysBuild=2

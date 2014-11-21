@@ -47,12 +47,12 @@ int Label::isVisible()
 
 void Label::draw()
 {
-	if (_visible)
-		sprintf(_buffer, _text, _value);
-	else
+	sprintf(_buffer, _text, _value);
+	
+	if (!_visible)
 	{
-		memset(_buffer, ' ', strlen(_text) + 4);
-		_buffer[strlen(_text) + 4] = 0;
+		memset(_buffer, ' ', strlen(_buffer));
+		_buffer[strlen(_buffer) + 1] = 0;
 	}
 
 	lcd_set_text_cursor(_x, _y);

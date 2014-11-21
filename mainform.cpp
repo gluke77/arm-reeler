@@ -148,6 +148,9 @@ void MainForm::showOtherButtons(int flag)
 		if (reelCountFrame.isVisible())
 			reelCountFrame.hide();
 
+		if (reelMaxCountLabel.isVisible())
+			reelMaxCountLabel.hide();
+
 		okButton.show();
 		cancelButton.show();
 		lessButton.show();
@@ -176,6 +179,12 @@ void MainForm::show()
 
 	stepLabel.setValue(tube_get_step());
 
+	reelAProgressBar.setValue(emm2kg(reel_tension_get_value(REEL_A)));
+	reelBProgressBar.setValue(emm2kg(reel_tension_get_value(REEL_B)));
+
+	reelALabel.setValue(emm2kg(reel_tension_get_value(REEL_A)));
+	reelBLabel.setValue(emm2kg(reel_tension_get_value(REEL_B)));
+
 
 	menuButton.show();
 
@@ -192,6 +201,7 @@ void MainForm::show()
 	stepRoundFrame.show();
 
    	widgetSelected = SELECTED_NONE;
+	showOtherButtons(0);
 }
 
 void MainForm::hide()
@@ -219,6 +229,8 @@ void MainForm::hide()
 
 	reelCountLabel.hide();
 	reelCountFrame.hide();
+
+	reelMaxCountLabel.hide();
 
 	lcd_fill_text(' ');
 	lcd_set_layer(1, LCD_LAYER_ON);
@@ -392,26 +404,33 @@ void MainForm::update()
 
 		if (reelCountFrame.isVisible())
 			reelCountFrame.hide();
+
+		if (reelMaxCountLabel.isVisible())
+			reelMaxCountLabel.hide();
 	}
 	else 
 	{
 		if (REEL_A == reel_get_selected())
 		{
-			reelCountLabel.setText(" ¿“”ÿ ¿ ¿ %02.0f ¬»“ Œ¬");
+			//reelCountLabel.setText(" ¿“”ÿ ¿ ¿ %02.0f ¬»“ Œ¬");
 		 	reelCountLabel.setValue(reel_turn_count(REEL_A));
 		}
 		else
 		{
-			reelCountLabel.setText(" ¿“”ÿ ¿ ¡ %02.0f ¬»“ Œ¬");
+			//reelCountLabel.setText(" ¿“”ÿ ¿ ¡ %02.0f ¬»“ Œ¬");
 			reelCountLabel.setValue(reel_turn_count(REEL_B));		
 		}
 		
+		reelMaxCountLabel.setValue(tube_get_max_turn_count());
 
 		if (!reelCountLabel.isVisible())
 			reelCountLabel.show();
 
 		if (!reelCountFrame.isVisible())
 			reelCountFrame.show();
+
+		if (!reelMaxCountLabel.isVisible())
+			reelMaxCountLabel.show();
 	}
 }
 

@@ -322,20 +322,14 @@ void do_reel_leaves(int reel)
 	if (reel_leaves_open_button_is_pressed(reel) && !gs_reels[reel].leaves_open_button_prev_state)
 	{
 		if (reel_is_stopped(reel) && reel_leaves_are_closed(reel))
-		{
 			reel_leaves_open(reel);
-			reel_leaves_lamp_blink_on(reel);
-		}
 		else
 			reel_leaves_lamp_short_blink_on(reel);
 	}
 	else if (reel_leaves_close_button_is_pressed(reel) && !gs_reels[reel].leaves_close_button_prev_state)
 	{
 		if (reel_leaves_are_open(reel) && reel_is_stopped(reel))
-		{
 			reel_leaves_close(reel);
-			reel_leaves_lamp_blink_off(reel);
-		}
 		else
 			reel_leaves_lamp_short_blink_on(reel);
 	}
@@ -668,7 +662,8 @@ void do_reel_turn(int reel)
 
 		if ((gs_reels[reel].turn_count >= tube_get_max_turn_count()) && (SIREN_LONG != get_siren_mode()))
 			set_siren_mode(SIREN_LONG);
-		else if ((gs_reels[reel].turn_count >= tube_get_warn_turn_count()) && (SIREN_SHORT != get_siren_mode()))
+		else if ((gs_reels[reel].turn_count >= tube_get_warn_turn_count()) && 
+				(gs_reels[reel].turn_count < tube_get_max_turn_count()) && (SIREN_SHORT != get_siren_mode()))
 			set_siren_mode(SIREN_SHORT);
 
 	}

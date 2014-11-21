@@ -4,6 +4,7 @@
 #include "mainform.h"
 #include "sensorform.h"
 #include "controlform.h"
+#include "profileform.h"
 
 MenuForm menufrm;
 
@@ -20,7 +21,8 @@ void onMenufrm_RsButtonRelease()
 
 void onMenufrm_LayerButtonRelease()
 {
-
+	menufrm.hide();
+	profilefrm.show();
 }
 
 void onMenufrm_CaliberRelease()

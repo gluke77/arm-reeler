@@ -29,6 +29,7 @@ extern "C" {
 #define USART_PROTOCOL_101		(1)
 #define USART_PROTOCOL_UZS		(2)
 #define USART_PROTOCOL_SEC		(3)
+#define USART_PROTOCOL_ECHO		(4)
 
 #define USART_INT_DISABLE	(0)
 #define USART_INT_ENABLE	(1 << 7)
@@ -79,11 +80,13 @@ void usart0_setprotocol_modbus(void);
 void usart0_setprotocol_101(void);
 void usart0_setprotocol_uzs(void);
 void usart0_setprotocol_sec(void);
+void usart0_setprotocol_echo(void);
 
 void usart0_rx_byte_modbus(char /* byte */);
 void usart0_rx_byte_101(char /* byte */);
 void usart0_rx_byte_uzs(char /* byte */);
 void usart0_rx_byte_sec(char /* byte */);
+void usart0_rx_byte_echo(char /* byte */);
 
 #endif /* _USART0 */
 

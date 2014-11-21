@@ -35,6 +35,7 @@ public:
 	RoundFrame	stepRoundFrame;
 	Label		reelCountLabel;
 	RoundFrame	reelCountFrame;
+	Label		reelMaxCountLabel;
 
 	enum {SELECTED_NONE = 0, SELECTED_REEL_A, SELECTED_REEL_B, SELECTED_STEP};
 	int widgetSelected;
@@ -47,7 +48,8 @@ public:
 		reelARoundFrame(23, 41, 295, 85, 1), reelBRoundFrame(23, 89, 295, 133, 1),
 		reelALabel(5, 3, "Êàòóøêà À  %2.0f êã "), reelBLabel(5, 6, "Êàòóøêà Á  %2.0f êã "),
 		stepLabel(5, 10, "ØÀÃ ÓÊËÀÄ×ÈÊÀ  %2.0f ìì"), stepRoundFrame(15, 151, 303, 183, 3),
-		reelCountLabel(5, 13, "ÊÀÒÓØÊÀ À %2.0f ÂÈÒÊÎÂ"), reelCountFrame(15, 199, 239, 231, 3),
+		reelCountLabel(5, 13, "×ÈÑËÎ ÂÈÒÊÎÂ %2.0f"), reelCountFrame(15, 199, 239, 231, 3),
+		reelMaxCountLabel(20, 13, " ÈÇ %2.0f"),
 		widgetSelected(SELECTED_NONE)
 	{
 		cancelButton.setOnRelease(onMainfrm_CancelButtonRelease);

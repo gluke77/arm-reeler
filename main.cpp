@@ -26,6 +26,7 @@
 #include "menuform.h"
 #include "sensorform.h"
 #include "controlform.h"
+#include "profileform.h"
 
 char buf[200];
 
@@ -44,6 +45,10 @@ void touch_pressed(int, int);
 void touch_released(int, int);
 void do_stop(void);
 void calculate_encoder_rate(void);
+
+void reset_settings(void);
+void load_settings(void);
+int save_settings(void);
 
 #define TIMER_TIMEOUT (10)
 
@@ -70,8 +75,10 @@ int main(void)
 	volatile int   i = 0;
 	uint8_t blink_timer_id = 0;
 
+	load_settings();
+
 	rtc_init();
-	tube_init();
+	//tube_init();
 	control_init();
 	beep_init();
 
@@ -120,6 +127,9 @@ int main(void)
 			blink_timer_id = 0;
 			if (mainfrm.isVisible())
 				mainfrm.doBlink();
+
+			if (profilefrm.isVisible())
+				profilefrm.doBlink();
 		}
 
 		if (mainfrm.isVisible())
@@ -148,6 +158,7 @@ void process_usart0(void)
 {
 	int			i;
 	uint16_t	value;
+	uint16_t	addr;
 
 	modbus_cmd_s	cmd;
 	result_e		res;
@@ -157,35 +168,533 @@ void process_usart0(void)
 		return;
 		
 	usart0_msg_ready = 0;
+
 	res = modbus_msg2cmd((const char *)usart0_inbuf, &cmd);
-			
+
 	if (RESULT_OK == res)
 		if (g_modbus_id == cmd.device_id)
 		{
 			if (MODBUS_WRITE == cmd.cmd_code)
 			{
-/*				value = cmd.value[0];
-				switch (cmd.addr)
+				addr = cmd.addr;
+				value = cmd.value[0];
+
+				switch (addr)
 				{
 				case 0x0000:
-					switch (value)
+					if (value < TUBE_SETTINGS_COUNT)
 					{
-					case 0x0001:
-						break;
-					default:
-						break;
+						tube_set_settings_id(value);
+					
+						if (mainfrm.isVisible())
+						{
+						 	if (mainfrm.SELECTED_STEP == mainfrm.widgetSelected)
+							{
+							 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+								mainfrm.showOtherButtons(0);	
+							}
+							
+							mainfrm.stepLabel.setValue(tube_get_step());
+						}
+						else if (profilefrm.isVisible())
+							profilefrm.show();
 					}
 					break;
-				default:
+
+				case 0x0001:
+					if (value > 6000)
+						value  = 6000;
+					
+					g_invertor_speed = value;
+	
 					break;
+
+				case 0x0002:
+					if (value > mainfrm.reelAProgressBar.getMaxValue())
+						value = mainfrm.reelAProgressBar.getMaxValue();					
+					
+					if (value < mainfrm.reelAProgressBar.getMinValue())
+						value = mainfrm.reelAProgressBar.getMinValue();					
+
+					if ((0 < value) && (value < 10))
+						value = 10;
+
+					if (mainfrm.isVisible())
+					 	if (mainfrm.SELECTED_REEL_A == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+
+					mainfrm.reelAProgressBar.setValue(value);
+					mainfrm.reelALabel.setValue(mainfrm.reelAProgressBar.getValue());
+					reel_tension_set_value(REEL_A, kg2emm(mainfrm.reelAProgressBar.getValue()));					
+
+					break;
+
+				case 0x0003:
+					if (value > mainfrm.reelBProgressBar.getMaxValue())
+						value = mainfrm.reelBProgressBar.getMaxValue();					
+					
+					if (value < mainfrm.reelBProgressBar.getMinValue())
+						value = mainfrm.reelBProgressBar.getMinValue();					
+
+					if ((0 < value) && (value < 10))
+						value = 10;
+
+					if (mainfrm.isVisible())
+					 	if (mainfrm.SELECTED_REEL_B == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+
+					mainfrm.reelBProgressBar.setValue(value);
+					mainfrm.reelBLabel.setValue(mainfrm.reelBProgressBar.getValue());
+					reel_tension_set_value(REEL_B, kg2emm(mainfrm.reelBProgressBar.getValue()));
+					
+					break;
+
+				case 0x0005:
+					if (value & 1 << 0)
+					{
+						if (reel_leaves_are_open(REEL_A) && reel_is_stopped(REEL_A))
+							reel_leaves_close(REEL_A);
+						else
+							reel_leaves_lamp_short_blink_on(REEL_A);
+					}
+
+					if (value & 1 << 1)
+					{
+						if (reel_is_stopped(REEL_A) && reel_leaves_are_closed(REEL_A))
+							reel_leaves_open(REEL_A);
+						else
+							reel_leaves_lamp_short_blink_on(REEL_A);
+					}
+
+					if (value & 1 << 2)
+					{
+						if (reel_leaves_are_open(REEL_B) && reel_is_stopped(REEL_B))
+							reel_leaves_close(REEL_B);
+						else
+							reel_leaves_lamp_short_blink_on(REEL_B);
+					}
+
+
+					if (value & 1 << 3)
+					{
+						if (reel_is_stopped(REEL_B) && reel_leaves_are_closed(REEL_B))
+							reel_leaves_open(REEL_B);
+						else
+							reel_leaves_lamp_short_blink_on(REEL_B);
+					}
+
+
+					if (value & 1 << 4)
+						reel_tension_off(REEL_A);
+
+					if (value & 1 << 5)
+					{
+						if ((reel_get_selected() == REEL_A) && reel_leaves_are_closed(REEL_A))
+							reel_tension_on(REEL_A);
+						else
+							reel_tension_lamp_blink_on(REEL_A);
+					}
+
+					if (value & 1 << 6)
+						reel_tension_off(REEL_B);
+
+					if (value & 1 << 7)
+					{
+						if ((reel_get_selected() == REEL_B) && reel_leaves_are_closed(REEL_B))
+							reel_tension_on(REEL_B);
+						else
+							reel_tension_lamp_blink_on(REEL_B);
+					}
+
+
+					break;					
+
+				case 0x0100:
+					if (value > 99)
+						value = 99;
+
+					tube_set_step_by_id(0, value);
+					
+					if (profilefrm.isVisible() && (0 == tube_get_settings_id()))
+					{
+						profilefrm.stepLabel.setValue(value);
+
+						if (profilefrm.SELECTED_STEP == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					if (mainfrm.isVisible() && (0 == tube_get_settings_id()))
+					{
+					 	if (mainfrm.SELECTED_STEP == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+						
+						mainfrm.stepLabel.setValue(tube_get_step());
+					}
+
+					break;
+
+				case 0x0101:
+					if (value > 9999)
+						value = 9999;
+
+					tube_set_max_layer_pulse_count_by_id(0, value);
+					
+					if (profilefrm.isVisible() && (0 == tube_get_settings_id()))
+					{
+						profilefrm.pulseLabel.setValue(value);
+
+						if (profilefrm.SELECTED_PULSE == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0102:
+					if (value > 99)
+						value = 99;
+
+					tube_set_warn_turn_count_by_id(0, value);
+					
+					if (profilefrm.isVisible() && (0 == tube_get_settings_id()))
+					{
+						profilefrm.warnLabel.setValue(value);
+
+						if (profilefrm.SELECTED_WARN == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0103:
+					if (value > 99)
+						value = 99;
+
+					tube_set_max_turn_count_by_id(0, value);
+					
+					if (profilefrm.isVisible() && (0 == tube_get_settings_id()))
+					{
+						profilefrm.maxLabel.setValue(value);
+
+						if (profilefrm.SELECTED_MAX == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0200:
+					if (value > 99)
+						value = 99;
+
+					tube_set_step_by_id(1, value);
+					
+					if (profilefrm.isVisible() && (1 == tube_get_settings_id()))
+					{
+						profilefrm.stepLabel.setValue(value);
+
+						if (profilefrm.SELECTED_STEP == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					if (mainfrm.isVisible() && (1 == tube_get_settings_id()))
+					{
+					 	if (mainfrm.SELECTED_STEP == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+						
+						mainfrm.stepLabel.setValue(tube_get_step());
+					}
+
+					break;
+
+				case 0x0201:
+					if (value > 9999)
+						value = 9999;
+
+					tube_set_max_layer_pulse_count_by_id(1, value);
+					
+					if (profilefrm.isVisible() && (1 == tube_get_settings_id()))
+					{
+						profilefrm.pulseLabel.setValue(value);
+
+						if (profilefrm.SELECTED_PULSE == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0202:
+					if (value > 99)
+						value = 99;
+
+					tube_set_warn_turn_count_by_id(1, value);
+					
+					if (profilefrm.isVisible() && (1 == tube_get_settings_id()))
+					{
+						profilefrm.warnLabel.setValue(value);
+
+						if (profilefrm.SELECTED_WARN == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0203:
+					if (value > 99)
+						value = 99;
+
+					tube_set_max_turn_count_by_id(1, value);
+					
+					if (profilefrm.isVisible() && (1 == tube_get_settings_id()))
+					{
+						profilefrm.maxLabel.setValue(value);
+
+						if (profilefrm.SELECTED_MAX == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0300:
+					if (value > 99)
+						value = 99;
+
+					tube_set_step_by_id(2, value);
+					
+					if (profilefrm.isVisible() && (2 == tube_get_settings_id()))
+					{
+						profilefrm.stepLabel.setValue(value);
+
+						if (profilefrm.SELECTED_STEP == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					if (mainfrm.isVisible() && (2 == tube_get_settings_id()))
+					{
+					 	if (mainfrm.SELECTED_STEP == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+						
+						mainfrm.stepLabel.setValue(tube_get_step());
+					}
+
+					break;
+
+				case 0x0301:
+					if (value > 9999)
+						value = 9999;
+
+					tube_set_max_layer_pulse_count_by_id(2, value);
+					
+					if (profilefrm.isVisible() && (2 == tube_get_settings_id()))
+					{
+						profilefrm.pulseLabel.setValue(value);
+
+						if (profilefrm.SELECTED_PULSE == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0302:
+					if (value > 99)
+						value = 99;
+
+					tube_set_warn_turn_count_by_id(2, value);
+					
+					if (profilefrm.isVisible() && (2 == tube_get_settings_id()))
+					{
+						profilefrm.warnLabel.setValue(value);
+
+						if (profilefrm.SELECTED_WARN == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0303:
+					if (value > 99)
+						value = 99;
+
+					tube_set_max_turn_count_by_id(2, value);
+					
+					if (profilefrm.isVisible() && (2 == tube_get_settings_id()))
+					{
+						profilefrm.maxLabel.setValue(value);
+
+						if (profilefrm.SELECTED_MAX == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0400:
+					if (value > 99)
+						value = 99;
+
+					tube_set_step_by_id(3, value);
+					
+					if (profilefrm.isVisible() && (3 == tube_get_settings_id()))
+					{
+						profilefrm.stepLabel.setValue(value);
+
+						if (profilefrm.SELECTED_STEP == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					if (mainfrm.isVisible() && (3 == tube_get_settings_id()))
+					{
+					 	if (mainfrm.SELECTED_STEP == mainfrm.widgetSelected)
+						{
+						 	mainfrm.widgetSelected = MainForm::SELECTED_NONE;
+							mainfrm.showOtherButtons(0);	
+						}
+						
+						mainfrm.stepLabel.setValue(tube_get_step());
+					}
+
+					break;
+
+				case 0x0401:
+					if (value > 9999)
+						value = 9999;
+
+					tube_set_max_layer_pulse_count_by_id(3, value);
+					
+					if (profilefrm.isVisible() && (3 == tube_get_settings_id()))
+					{
+						profilefrm.pulseLabel.setValue(value);
+
+						if (profilefrm.SELECTED_PULSE == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0402:
+					if (value > 99)
+						value = 99;
+
+					tube_set_warn_turn_count_by_id(3, value);
+					
+					if (profilefrm.isVisible() && (3 == tube_get_settings_id()))
+					{
+						profilefrm.warnLabel.setValue(value);
+
+						if (profilefrm.SELECTED_WARN == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0x0403:
+					if (value > 99)
+						value = 99;
+
+					tube_set_max_turn_count_by_id(3, value);
+					
+					if (profilefrm.isVisible() && (3 == tube_get_settings_id()))
+					{
+						profilefrm.maxLabel.setValue(value);
+
+						if (profilefrm.SELECTED_MAX == profilefrm.widgetSelected)
+						{
+							profilefrm.widgetSelected = profilefrm.SELECTED_NONE;
+							profilefrm.showOtherButtons(0);
+						}
+					}
+
+					break;
+
+				case 0xFFFF:
+
+					if (0xF0F0 == value)
+						reset_settings();
+					else if (0x0F0F == value)
+					{
+						load_settings();
+					
+						if (mainfrm.isVisible())
+							mainfrm.show();
+
+						if (profilefrm.isVisible())
+							profilefrm.show();
+					}
+					else if (0xA55A == value)
+						cmd.value[0] = save_settings();
+					else
+						cmd.value[0] = 0xFFFF;
+
+					break;						
+				
+				default:
+					cmd.addr = 0xFFFF;
+					cmd.value[0] = 0xFFFF;
+
+ 					break;
 				}
-*/
+
 				cmd.device_id = g_modbus_id;
 				cmd.cmd_code = MODBUS_WRITE;
 				cmd.cmd_type = MODBUS_ACK;
-				cmd.addr = 0xFFFF;
-				cmd.value[0] = 0xFFFF;
-				
+
 				modbus_cmd2msg(&cmd, msg, MODBUS_MAX_MSG_LENGTH);
 				usart0_cmd(msg, 0, 0, 300);
 			}
@@ -202,8 +711,8 @@ void process_usart0(void)
 					cmd.value[cmd.addr++] = (uint16_t)sensor_value();
 					cmd.value[cmd.addr++] = (uint16_t)control_value();
 					cmd.value[cmd.addr++] = (uint16_t)g_invertor_speed;						
-					cmd.value[cmd.addr++] = (uint16_t)reel_tension_get_value(REEL_A);
-					cmd.value[cmd.addr++] = (uint16_t)reel_tension_get_value(REEL_B);
+					cmd.value[cmd.addr++] = (uint16_t)emm2kg(reel_tension_get_value(REEL_A));
+					cmd.value[cmd.addr++] = (uint16_t)emm2kg(reel_tension_get_value(REEL_B));
 					cmd.value[cmd.addr++] = (uint16_t)reel_turn_count(REEL_A);
 					cmd.value[cmd.addr++] = (uint16_t)reel_turn_count(REEL_B);
 					cmd.value[cmd.addr++] = (uint16_t)tube_get_settings_id();
@@ -238,8 +747,57 @@ void process_usart0(void)
 					cmd.value[cmd.addr++] = value;
 
 				}
+				else if (0x0001 == cmd.addr)
+				{
+					cmd.addr = 0;
 
-				
+					cmd.value[cmd.addr++] = tube_get_step_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(0);
+				}
+				else if (0x0001 == cmd.addr)
+				{
+					cmd.addr = 0;
+
+					cmd.value[cmd.addr++] = tube_get_step_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(0);
+					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(0);
+				}
+				else if (0x0002 == cmd.addr)
+				{
+					cmd.addr = 0;
+
+					cmd.value[cmd.addr++] = tube_get_step_by_id(1);
+					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(1);
+					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(1);
+					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(1);
+				}
+				else if (0x0003 == cmd.addr)
+				{
+					cmd.addr = 0;
+
+					cmd.value[cmd.addr++] = tube_get_step_by_id(2);
+					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(2);
+					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(2);
+					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(2);
+				}
+				else if (0x0004 == cmd.addr)
+				{
+					cmd.addr = 0;
+
+					cmd.value[cmd.addr++] = tube_get_step_by_id(3);
+					cmd.value[cmd.addr++] = tube_get_max_layer_pulse_count_by_id(3);
+					cmd.value[cmd.addr++] = tube_get_warn_turn_count_by_id(3);
+					cmd.value[cmd.addr++] = tube_get_max_turn_count_by_id(3);
+				}
+				else
+				{
+					cmd.addr = 1;
+					cmd.value[0] = 0xFFFF;
+				}
+
 				modbus_cmd2msg(&cmd, msg, MODBUS_MAX_MSG_LENGTH);
 				usart0_cmd(msg, 0, 0, 300);
 			}
@@ -257,7 +815,7 @@ void process_usart1(void)
 	}
 	else
 	{
-		process_invertor();
+		//process_invertor();
 		next = 1;
 	}
 }
@@ -473,6 +1031,8 @@ void do_touch(void)
 			sensorfrm.onRelease(old_x, old_y);
 		else if (controlfrm.isVisible())
 			controlfrm.onRelease(old_x, old_y);
+		else if (profilefrm.isVisible())
+			profilefrm.onRelease(old_x, old_y);
 
 	}
 
@@ -486,7 +1046,8 @@ void do_touch(void)
 			sensorfrm.onPress(x, y);
 		else if (controlfrm.isVisible())
 			controlfrm.onPress(x, y);
-
+		else if (profilefrm.isVisible())
+			profilefrm.onPress(x, y);
 	}
 
 	old_x = x;
@@ -540,4 +1101,106 @@ void calculate_encoder_rate(void)
 	pulse_count = new_pcount;
 }
 
+void reset_settings(void)
+{
+	tube_set_settings_id(0);
+	
+	tube_set_step_by_id(0, 16);
+	tube_set_max_layer_pulse_count_by_id(0, 800);
+	tube_set_warn_turn_count_by_id(0, 15);
+	tube_set_max_turn_count_by_id(0, 20);
+
+	tube_set_step_by_id(1, 20);
+	tube_set_max_layer_pulse_count_by_id(1, 1000);
+	tube_set_warn_turn_count_by_id(1, 15);
+	tube_set_max_turn_count_by_id(1, 20);
+
+	tube_set_step_by_id(2, 26);
+	tube_set_max_layer_pulse_count_by_id(2, 1300);
+	tube_set_warn_turn_count_by_id(2, 15);
+	tube_set_max_turn_count_by_id(2, 20);
+
+	tube_set_step_by_id(3, 32);
+	tube_set_max_layer_pulse_count_by_id(3, 1600);
+	tube_set_warn_turn_count_by_id(3, 15);
+	tube_set_max_turn_count_by_id(3, 20);
+
+	g_invertor_speed = 3000;
+
+	reel_tension_set_value(REEL_A, kg2emm(40));
+	reel_tension_set_value(REEL_B, kg2emm(40));
+
+}
+
+void load_settings(void)
+{
+	int * i = (int *)IAP_FLASH_BEGIN;
+
+	tube_set_settings_id(*i++);
+	
+	tube_set_step_by_id(0, *i++);
+	tube_set_max_layer_pulse_count_by_id(0, *i++);
+	tube_set_warn_turn_count_by_id(0, *i++);
+	tube_set_max_turn_count_by_id(0, *i++);
+
+	tube_set_step_by_id(1, *i++);
+	tube_set_max_layer_pulse_count_by_id(1, *i++);
+	tube_set_warn_turn_count_by_id(1, *i++);
+	tube_set_max_turn_count_by_id(1, *i++);
+
+	tube_set_step_by_id(2, *i++);
+	tube_set_max_layer_pulse_count_by_id(2, *i++);
+	tube_set_warn_turn_count_by_id(2, *i++);
+	tube_set_max_turn_count_by_id(2, *i++);
+
+	tube_set_step_by_id(3, *i++);
+	tube_set_max_layer_pulse_count_by_id(3, *i++);
+	tube_set_warn_turn_count_by_id(3, *i++);
+	tube_set_max_turn_count_by_id(3, *i++);
+
+	g_invertor_speed = *i++;
+
+	reel_tension_set_value(REEL_A, *i++);
+	reel_tension_set_value(REEL_B, *i++);
+}
+
+int save_settings(void)
+{
+	int settings[128];
+	int i = 0;
+
+	settings[i++] = tube_get_settings_id();
+
+	settings[i++] = tube_get_step_by_id(0);
+	settings[i++] = tube_get_max_layer_pulse_count_by_id(0);
+	settings[i++] = tube_get_warn_turn_count_by_id(0);
+	settings[i++] = tube_get_max_turn_count_by_id(0);
+
+	settings[i++] = tube_get_step_by_id(1);
+	settings[i++] = tube_get_max_layer_pulse_count_by_id(1);
+	settings[i++] = tube_get_warn_turn_count_by_id(1);
+	settings[i++] = tube_get_max_turn_count_by_id(1);
+
+	settings[i++] = tube_get_step_by_id(2);
+	settings[i++] = tube_get_max_layer_pulse_count_by_id(2);
+	settings[i++] = tube_get_warn_turn_count_by_id(2);
+	settings[i++] = tube_get_max_turn_count_by_id(2);
+
+	settings[i++] = tube_get_step_by_id(3);
+	settings[i++] = tube_get_max_layer_pulse_count_by_id(3);
+	settings[i++] = tube_get_warn_turn_count_by_id(3);
+	settings[i++] = tube_get_max_turn_count_by_id(3);
+
+	settings[i++] = g_invertor_speed;
+
+	settings[i++] = reel_tension_get_value(REEL_A);
+	settings[i++] = reel_tension_get_value(REEL_B);
+
+	i = iap_clear_flash();
+
+	if (IAP_CMD_SUCCESS != i)
+		return i;
+
+	return iap_copy_ram_to_flash(settings, 512);
+}
 

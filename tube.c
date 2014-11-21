@@ -37,13 +37,6 @@ void tube_init(void)
 	gs_tube_settings[3].reel_warn_turn_count = 15;
 }
 
-int tube_get_step_by_id(int id)
-{
-	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
-		return 0;
-
-	return gs_tube_settings[id].step;
-}
 
 void tube_set_settings_id(int id)
 {
@@ -76,3 +69,86 @@ int tube_get_warn_turn_count(void)
 	return gs_tube_settings[gs_tube_settings_id].reel_warn_turn_count;
 }
 
+int tube_get_step_by_id(int id)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return 0;
+
+	return gs_tube_settings[id].step;
+}
+
+int tube_get_max_layer_pulse_count_by_id(int id)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return 0;
+
+	return gs_tube_settings[id].layer_pulse_count;
+}
+
+int tube_get_warn_turn_count_by_id(int id)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return 0;
+
+	return gs_tube_settings[id].reel_warn_turn_count;
+}
+
+int tube_get_max_turn_count_by_id(int id)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return 0;
+
+	return gs_tube_settings[id].reel_max_turn_count;
+}
+
+void tube_set_step_by_id(int id, int step)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return;
+
+	gs_tube_settings[id].step = step;
+}
+
+void tube_set_max_layer_pulse_count_by_id(int id, int pulse_count)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return;
+
+	gs_tube_settings[id].layer_pulse_count = pulse_count;
+}
+
+void tube_set_warn_turn_count_by_id(int id, int warn_count)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return;
+
+	gs_tube_settings[id].reel_warn_turn_count = warn_count;
+}
+
+void tube_set_max_turn_count_by_id(int id, int max_count)
+{
+	if ((id < 0) || (id >= TUBE_SETTINGS_COUNT))
+		return;
+
+	gs_tube_settings[id].reel_max_turn_count = max_count;
+}
+
+void tube_set_step(int step)
+{
+	gs_tube_settings[gs_tube_settings_id].step = step;
+}
+
+void tube_set_max_layer_pulse_count(int pulse_count)
+{
+	gs_tube_settings[gs_tube_settings_id].layer_pulse_count = pulse_count;
+}
+
+void tube_set_warn_turn_count(int warn_count)
+{
+	gs_tube_settings[gs_tube_settings_id].reel_warn_turn_count = warn_count;
+}
+
+void tube_set_max_turn_count(int max_count)
+{
+	gs_tube_settings[gs_tube_settings_id].reel_max_turn_count = max_count;
+}

@@ -108,6 +108,12 @@ void usart0_setprotocol_modbus(void)
 	usart0_protocol = USART_PROTOCOL_MODBUS;
 }
 
+void usart0_setprotocol_echo(void)
+{
+	USART0_SET_7N2;
+	usart0_protocol = USART_PROTOCOL_ECHO;
+}
+
 void usart0_setprotocol_101(void)
 {
 	USART0_SET_8N1;
@@ -174,6 +180,9 @@ void usart0_recv(void) __irq
 		case USART_PROTOCOL_SEC:
 			usart0_rx_byte_sec(byte);
 			break;
+		case USART_PROTOCOL_ECHO:
+			usart0_rx_byte_echo(byte);
+			break;
 		}
 	}
 
@@ -214,8 +223,8 @@ result_e usart0_cmd(char * req, char * ack, size_t ack_size, short int delay)
 		return RESULT_OK;
 	}
 
-	return RESULT_BAD_ACK;
-/*	
+	// return RESULT_BAD_ACK;
+	
 	usart0_read();
 	
 	res = RESULT_TIMEOUT;
@@ -224,16 +233,20 @@ result_e usart0_cmd(char * req, char * ack, size_t ack_size, short int delay)
 		
 	while (timer_value(timer_id))
 	{
-		USART0_RX_INT_DISABLE;
+		if (USART_INT_ENABLE == usart0_int_mode)
+			USART0_RX_INT_DISABLE;
+		
 		if (usart0_msg_ready)
 		{
 			res = RESULT_OK;
 			usart0_msg_ready = 0;
-			memcpy(ack, usart0_inbuf, (ack_size < USART0_INBUF_SIZE)?ack_size:USART0_INBUF_SIZE);
+			memcpy(ack, (const void *)usart0_inbuf, (ack_size < USART0_INBUF_SIZE)?ack_size:USART0_INBUF_SIZE);
 			stop_timer(timer_id);
 			break;
 		}
-		USART0_RX_INT_ENABLE;	
+		
+		if (USART_INT_ENABLE == usart0_int_mode)
+			USART0_RX_INT_ENABLE;	
 	}
 	stop_timer(timer_id);
 
@@ -241,9 +254,7 @@ result_e usart0_cmd(char * req, char * ack, size_t ack_size, short int delay)
 		usart0_write();	
 
 	return res;
-*/
 }
-
 
 void usart0_rx_byte_modbus(char byte)
 {
@@ -341,6 +352,13 @@ void usart0_rx_byte_sec(char byte)
 		usart0_inbuf_pos = 0;
 		usart0_msg_ready = 0;
 	}
+}
+
+void usart0_rx_byte_echo(char byte)
+{
+	usart0_write();
+	usart0_putchar(byte);
+	usart0_read();
 }
 
 #endif /* _USART0 */

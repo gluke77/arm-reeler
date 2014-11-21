@@ -25,9 +25,10 @@ public:
 	RoundButton caliberButton;
 	RoundButton fastButton;
 
-	MenuForm() : mainButton(15, 6, 303, 40, 16, 1, "пюанрю"), rsButton(15, 54, 303, 88, 12, 4, "мюярпнийю онпрю"),
-		layerButton(15, 102, 303, 136, 10, 7, "мюярпнийю пюяйкюдйх"), caliberButton(15, 150, 303, 184, 17 /*11*/, 10, "бшундш" /*"йюкхапнбйю щйпюмю"*/),
-		fastButton(15, 198, 303, 232, 17 /*13*/, 13, "бундш" /*"ашярпюъ ялнрйю"*/)
+	MenuForm() : mainButton(11, 6, 303, 40, 14, 1, "пюанвхи щйпюм"), rsButton(13, 54, 303, 88, 11, 4, "мюярпнийю хмбепрнпю"),
+		layerButton(15, 102, 303, 136, 11, 7, "мюярпнийю сйкюдвхйю"), caliberButton(15, 150, 152, 184, 8, 10, "бшундш"),
+		fastButton(166, 150, 303, 184, 27 /*13*/, 10, "бундш" /*"ашярпюъ ялнрйю"*/)
+		//fastButton(15, 198, 303, 232, 17 /*13*/, 13, "бундш" /*"ашярпюъ ялнрйю"*/)
 	{
 		mainButton.setOnRelease(onMenufrm_MainButtonRelease);
 		rsButton.setOnRelease(onMenufrm_RsButtonRelease);

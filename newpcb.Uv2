@@ -39,6 +39,7 @@ File 1,8,<.\controlform.cpp><controlform.cpp>
 File 1,1,<.\tube.c><tube.c>
 File 1,1,<.\siren.c><siren.c>
 File 1,1,<.\iap.c><iap.c>
+File 1,8,<.\profileform.cpp><profileform.cpp>
 
 
 Options 1,0,0  // Target 'Target 1'
@@ -319,6 +320,23 @@ Options 1,1,29  // File 'sensorform.cpp'
 EndOpt
 
 Options 1,1,31  // File 'controlform.cpp'
+ PropFld { 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ ADSCCFLG { 2,84,85,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ADSCMISC ()
+ ADSCDEFN (__cplusplus__)
+ ADSCUDEF ()
+ ADSCINCD ()
+EndOpt
+
+Options 1,1,35  // File 'profileform.cpp'
  PropFld { 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
  IncBld=2
  AlwaysBuild=2

@@ -98,7 +98,7 @@ int main(void)
 	beep_init();
 
 	usart0_init(USART_RS485_SLAVE | USART_INT_ENABLE, g_usart0_baudrate);
-	usart1_init(USART_RS485_MASTER| USART_INT_ENABLE, g_usart1_baudrate);
+	usart1_init(USART_RS485_MASTER| USART_INT_DISABLE, g_usart1_baudrate);
 
 	lcd_init();
 	sensor_init();
@@ -1026,7 +1026,7 @@ int process_emm(void)
 
 	//memset(inbuf, 0, sizeof(inbuf));
 	res = usart1_cmd(msg, msg, MODBUS_MAX_MSG_LENGTH, 300);
-	
+
 	if (RESULT_OK != res)
 		return res;
 	

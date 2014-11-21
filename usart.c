@@ -582,23 +582,40 @@ result_e usart1_cmd(char * req, char * ack, size_t ack_size, short int delay)
 		
 	timer_id = start_timer(delay);
 		
-	while (timer_value(timer_id))
+	if (USART_INT_ENABLE == usart1_int_mode)
 	{
-		if (USART_INT_ENABLE == usart1_int_mode)
+		while (timer_value(timer_id))
+		{
 			USART1_RX_INT_DISABLE;
-		
+			
+			if (usart1_msg_ready)
+			{
+				res = RESULT_OK;
+				usart1_msg_ready = 0;
+				memcpy(ack, (const void *)usart1_inbuf, (ack_size < USART1_INBUF_SIZE)?ack_size:USART1_INBUF_SIZE);
+				stop_timer(timer_id);
+				break;
+			}
+			USART1_RX_INT_ENABLE;	
+		}
+	}
+	else
+	{
+		usart1_inbuf_pos = 0;
+		usart1_msg_ready = 0;
+
+		while (!usart1_msg_ready && timer_value(timer_id))
+			if (usart1_data_ready())
+				usart1_rx_byte_modbus(usart1_getchar());			
+
 		if (usart1_msg_ready)
 		{
 			res = RESULT_OK;
 			usart1_msg_ready = 0;
 			memcpy(ack, (const void *)usart1_inbuf, (ack_size < USART1_INBUF_SIZE)?ack_size:USART1_INBUF_SIZE);
-			stop_timer(timer_id);
-			break;
 		}
-		
-		if (USART_INT_ENABLE == usart1_int_mode)
-			USART1_RX_INT_ENABLE;	
 	}
+
 	stop_timer(timer_id);
 
 	if (USART_RS485_MASTER == usart1_getmode())

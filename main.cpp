@@ -28,9 +28,9 @@
 #include "controlform.h"
 #include "profileform.h"
 #include "settingsform.h"
-//#include "yesnoform.h"
+#include "yesnoform.h"
 
-char buf[200];
+//char buf[200];
 
 int g_layer_encoder_rate;
 
@@ -148,6 +148,9 @@ int main(void)
 	
 			if (settingsfrm.isVisible())
 				settingsfrm.doBlink();
+
+//			if (controlfrm.isVisible())
+//				controlfrm.update();
 		}
 
 		if (mainfrm.isVisible())
@@ -159,15 +162,9 @@ int main(void)
 		if (sensorfrm.isVisible())
 			sensorfrm.update();
 
-
 		do_touch();
 		do_siren();
-
-		if (!controlfrm.isVisible())
-		{
-			do_reel();
-		}
-
+		do_reel();
 
 		process_usart0();
 		process_usart1();
@@ -229,6 +226,9 @@ void process_usart0(void)
 					
 					g_invertor_speed = value;
 	
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+
 					break;
 
 				case 0x0002:
@@ -349,23 +349,43 @@ void process_usart0(void)
 					break;					
 				
 				case 0x0006:
-					g_usart1_baudrate = value * 100;	
+					g_usart1_baudrate = value * 100;
+					
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+						
 					break;
 
 				case 0x0007:
 					g_emm_id = value;	
+
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+
 					break;
 
 				case 0x0008:
 					g_invertor_id = value;	
+
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+
 					break;
 
 				case 0x0009:
 					g_invertor_read_addr = value;	
+
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+
 					break;
 
-				case 0x00010:
+				case 0x000A:
 					g_invertor_write_addr = value;	
+
+					if (settingsfrm.isVisible())
+						settingsfrm.show();
+
 					break;
 
 				case 0x0100:
@@ -1108,8 +1128,8 @@ void do_touch(void)
 			profilefrm.onRelease(old_x, old_y);
  		else if (settingsfrm.isVisible())
 			settingsfrm.onRelease(old_x, old_y);
-// 		else if (yesnofrm.isVisible())
-//			yesnofrm.onRelease(old_x, old_y);
+ 		else if (yesnofrm.isVisible())
+			yesnofrm.onRelease(old_x, old_y);
 
 
 	}
@@ -1128,8 +1148,8 @@ void do_touch(void)
 			profilefrm.onPress(x, y);
 		else if (settingsfrm.isVisible())
 			settingsfrm.onPress(x, y);
-//		else if (yesnofrm.isVisible())
-//			yesnofrm.onPress(x, y);
+		else if (yesnofrm.isVisible())
+			yesnofrm.onPress(x, y);
 
 
 	}

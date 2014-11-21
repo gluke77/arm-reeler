@@ -9,12 +9,13 @@
 
 YesNoForm yesnofrm;
 
-void YesNoForm::yesNo(char * text1, char * text2, char * text3, char * text4, char * yesText, char * noText, Form * parent, void (* onYes)(void), void (* onNo)(void))
+void YesNoForm::yesNo(char * text1, char * text2, char * text3, char * text4, char * text5, char * yesText, char * noText, Form * parent, void (* onYes)(void), void (* onNo)(void))
 {
 	label1.setText(text1);
 	label2.setText(text2);
 	label3.setText(text3);
 	label4.setText(text4);
+	label5.setText(text5);
 
 	yesButton.setText(yesText);
 	noButton.setText(noText);
@@ -56,6 +57,7 @@ void YesNoForm::show()
 	label2.show();
 	label3.show();
 	label4.show();
+	label5.show();
 
 	frame.show();
 }
@@ -71,6 +73,7 @@ void YesNoForm::hide()
 	label2.hide();
 	label3.hide();
 	label4.hide();
+	label5.hide();
 
 	frame.hide();
 
@@ -99,6 +102,7 @@ void YesNoForm::setActive(int a)
 	label2.setActive(a);
 	label3.setActive(a);
 	label4.setActive(a);
+	label5.setActive(a);
 
 	frame.setActive(a);
 

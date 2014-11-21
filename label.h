@@ -1,7 +1,7 @@
 #if !defined _LABEL_H_INCLUDED
 #define _LABEL_H_INCLUDED
 
-#define LABEL_TEXT_SIZE	(50)
+#define LABEL_TEXT_SIZE	(40)
 
 #include <string.h>
 

@@ -12,13 +12,13 @@ void onControlfrm_MenuButtonRelease();
 
 void onControlfrm_runALampButtonChange(int state);
 void onControlfrm_leavesALampButtonChange(int state);
-void onControlfrm_openAButtonChange(int state);
-void onControlfrm_closeAButtonChange(int state);
+void onControlfrm_openAButtonRelease();
+void onControlfrm_closeAButtonRelease();
 
 void onControlfrm_runBLampButtonChange(int state);
 void onControlfrm_leavesBLampButtonChange(int state);
-void onControlfrm_openBButtonChange(int state);
-void onControlfrm_closeBButtonChange(int state);
+void onControlfrm_openBButtonRelease();
+void onControlfrm_closeBButtonRelease();
 
 void onControlfrm_reelButtonChange(int state);
 void onControlfrm_layerButtonChange(int state);
@@ -35,13 +35,13 @@ public:
 	
 	ToggleButton	runALampButton;
 	ToggleButton	leavesALampButton;
-	ToggleButton	openAButton;
-	ToggleButton	closeAButton;
+	RoundButton		openAButton;
+	RoundButton		closeAButton;
 
 	ToggleButton	runBLampButton;
 	ToggleButton	leavesBLampButton;
-	ToggleButton	openBButton;
-	ToggleButton	closeBButton;
+	RoundButton		openBButton;
+	RoundButton		closeBButton;
 
 	ToggleButton	reelButton;
 	ToggleButton	layerButton;
@@ -64,13 +64,13 @@ public:
 
 		runALampButton.setOnChange( onControlfrm_runALampButtonChange);
 		leavesALampButton.setOnChange( onControlfrm_leavesALampButtonChange);
-		openAButton.setOnChange( onControlfrm_openAButtonChange);
-		closeAButton.setOnChange( onControlfrm_closeAButtonChange);
+		openAButton.setOnRelease( onControlfrm_openAButtonRelease);
+		closeAButton.setOnRelease( onControlfrm_closeAButtonRelease);
 
 		runBLampButton.setOnChange( onControlfrm_runBLampButtonChange);
 		leavesBLampButton.setOnChange( onControlfrm_leavesBLampButtonChange);
-		openBButton.setOnChange( onControlfrm_openBButtonChange);
-		closeBButton.setOnChange( onControlfrm_closeBButtonChange);
+		openBButton.setOnRelease( onControlfrm_openBButtonRelease);
+		closeBButton.setOnRelease( onControlfrm_closeBButtonRelease);
 
 		reelButton.setOnChange( onControlfrm_reelButtonChange);
 		layerButton.setOnChange( onControlfrm_layerButtonChange);
@@ -87,6 +87,8 @@ public:
 	virtual void onPress(int x, int y);
 	virtual void onRelease(int x, int y);
 	virtual void onMoveTo(int x, int y);
+
+	virtual void update();
 };
 
 extern ControlForm controlfrm;

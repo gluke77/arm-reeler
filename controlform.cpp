@@ -2,6 +2,7 @@
 #include "menuform.h"
 #include "lcd.h"
 #include "siren.h"
+#include "reel.h"
 
 #include "control.h"
 
@@ -41,13 +42,13 @@ void ControlForm::show()
 
 	runALampButton.setToggled(test_control(CONTROL_REEL_A_RUN_LAMP));
 	leavesALampButton.setToggled(test_control(CONTROL_LEAVES_A_LAMP));
-	openAButton.setToggled(test_control(CONTROL_LEAVES_A_OPEN));
-	closeAButton.setToggled(test_control(CONTROL_LEAVES_A_CLOSE));
+//	openAButton.setToggled(test_control(CONTROL_LEAVES_A_OPEN));
+//	closeAButton.setToggled(test_control(CONTROL_LEAVES_A_CLOSE));
 
 	runBLampButton.setToggled(test_control(CONTROL_REEL_B_RUN_LAMP));
 	leavesBLampButton.setToggled(test_control(CONTROL_LEAVES_B_LAMP));
-	openBButton.setToggled(test_control(CONTROL_LEAVES_B_OPEN));
-	closeBButton.setToggled(test_control(CONTROL_LEAVES_B_CLOSE));
+//	openBButton.setToggled(test_control(CONTROL_LEAVES_B_OPEN));
+//	closeBButton.setToggled(test_control(CONTROL_LEAVES_B_CLOSE));
 
 	reelButton.setToggled(test_control(CONTROL_REEL_DRIVE));
 	layerButton.setToggled(test_control(CONTROL_LAYER_DRIVE));
@@ -56,6 +57,28 @@ void ControlForm::show()
 
 	sirenButton.setText(sirenButtonText[get_siren_mode()]);
 
+}
+
+void ControlForm::update()
+{
+	
+	
+	runALampButton.setToggled(test_control(CONTROL_REEL_A_RUN_LAMP));
+	leavesALampButton.setToggled(test_control(CONTROL_LEAVES_A_LAMP));
+//	openAButton.setToggled(test_control(CONTROL_LEAVES_A_OPEN));
+//	closeAButton.setToggled(test_control(CONTROL_LEAVES_A_CLOSE));
+
+	runBLampButton.setToggled(test_control(CONTROL_REEL_B_RUN_LAMP));
+	leavesBLampButton.setToggled(test_control(CONTROL_LEAVES_B_LAMP));
+//	openBButton.setToggled(test_control(CONTROL_LEAVES_B_OPEN));
+//	closeBButton.setToggled(test_control(CONTROL_LEAVES_B_CLOSE));
+
+	reelButton.setToggled(test_control(CONTROL_REEL_DRIVE));
+	layerButton.setToggled(test_control(CONTROL_LAYER_DRIVE));
+	dirButton.setToggled(test_control(CONTROL_LAYER_DIRECTION));
+	stopLampButton.setToggled(test_control(CONTROL_STOP_LAMP));
+
+	sirenButton.setText(sirenButtonText[get_siren_mode()]);
 }
 
 void ControlForm::hide()
@@ -182,20 +205,17 @@ void onControlfrm_leavesALampButtonChange(int state)
 		control_off(CONTROL_LEAVES_A_LAMP);		
 }
 
-void onControlfrm_openAButtonChange(int state)
+void onControlfrm_openAButtonRelease()
 {
-	if (state)
-		control_on(CONTROL_LEAVES_A_OPEN);
-	else
-		control_off(CONTROL_LEAVES_A_OPEN);		
+		if (reel_is_stopped(REEL_A) && reel_leaves_are_closed(REEL_A))
+			reel_leaves_open(REEL_A);
+		else
+			reel_leaves_lamp_short_blink_on(REEL_A);
 }
 
-void onControlfrm_closeAButtonChange(int state)
+void onControlfrm_closeAButtonRelease()
 {
-	if (state)
-		control_on(CONTROL_LEAVES_A_CLOSE);
-	else
-		control_off(CONTROL_LEAVES_A_CLOSE);		
+	reel_leaves_close(REEL_A);
 }
 
 void onControlfrm_runBLampButtonChange(int state)
@@ -214,20 +234,17 @@ void onControlfrm_leavesBLampButtonChange(int state)
 		control_off(CONTROL_LEAVES_B_LAMP);		
 }
 
-void onControlfrm_openBButtonChange(int state)
+void onControlfrm_openBButtonRelease()
 {
-	if (state)
-		control_on(CONTROL_LEAVES_B_OPEN);
-	else
-		control_off(CONTROL_LEAVES_B_OPEN);		
+		if (reel_is_stopped(REEL_B) && reel_leaves_are_closed(REEL_B))
+			reel_leaves_open(REEL_B);
+		else
+			reel_leaves_lamp_short_blink_on(REEL_B);
 }
 
-void onControlfrm_closeBButtonChange(int state)
+void onControlfrm_closeBButtonRelease()
 {
-	if (state)
-		control_on(CONTROL_LEAVES_B_CLOSE);
-	else
-		control_off(CONTROL_LEAVES_B_CLOSE);		
+	reel_leaves_close(REEL_B);
 }
 
 void onControlfrm_reelButtonChange(int state)

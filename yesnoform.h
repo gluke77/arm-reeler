@@ -23,17 +23,19 @@ public:
 	Label	label2;
 	Label	label3;
 	Label	label4;
+	Label	label5;
 
 	RoundFrame	frame;
 
 	RoundButton yesButton;
 	RoundButton noButton;
 
-	YesNoForm() : yesButton(41, 65, 153, 95, 7, 10, ""), noButton(159, 65, 270, 95, 22, 10, ""),
+	YesNoForm() : yesButton(41, 144, 153, 191, 7, 10, ""), noButton(167, 144, 277, 190, 23, 10, ""),
 		label1(5, 2, ""),
-		label2(5, 4, ""),
-		label3(5, 5, ""),
-		label4(5, 6, ""),
+		label2(5, 3, ""),
+		label3(5, 4, ""),
+		label4(5, 5, ""),
+		label5(5, 6, ""),
 		frame(15, 6, 303, 223, 3)
 	{
 		yesButton.setOnRelease(onYesNofrm_YesRelease);
@@ -52,7 +54,7 @@ public:
 	virtual void onRelease(int x, int y);
 	virtual void onMoveTo(int x, int y);
 
-	void	yesNo(char * text1, char * text2, char * text3, char * text4, char * yesText, char * noText, Form * parent, void (* onYes)(void), void (* onNo)(void));
+	void	yesNo(char * text1, char * text2, char * text3, char * text4, char * text5, char * yesText, char * noText, Form * parent, void (* onYes)(void), void (* onNo)(void));
 };
 
 extern YesNoForm yesnofrm;

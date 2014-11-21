@@ -158,7 +158,7 @@ BCFG2_OFS       EQU     0x08            ; BCFG2 Offset
 BCFG3_OFS       EQU     0x0C            ; BCFG3 Offset
 
 ;// <e> External Memory Controller (EMC)
-EMC_SETUP       EQU     0
+EMC_SETUP       EQU     1
 
 ;//   <e> Bank Configuration 0 (BCFG0)
 ;//     <o1.0..3>   IDCY: Idle Cycles <0-15>
@@ -184,7 +184,7 @@ BCFG0_Val   EQU         0x0000FBEF
 ;//                                   <2=> 32-bit  <3=> Reserved
 ;//   </e>
 BCFG1_SETUP EQU         0
-BCFG1_Val   EQU         0x0000FBEF
+BCFG1_Val   EQU         0x2000FFEF
 
 ;//   <e> Bank Configuration 2 (BCFG2)
 ;//     <o1.0..3>   IDCY: Idle Cycles <0-15>

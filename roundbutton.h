@@ -4,7 +4,7 @@
 #include "button.h"
 #include "string.h"
 
-#define ROUNDBUTTON_MAX_TEXT_SIZE	(50)
+#define ROUNDBUTTON_MAX_TEXT_SIZE	(40)
 
 class RoundButton : public Button
 {

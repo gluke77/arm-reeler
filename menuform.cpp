@@ -6,7 +6,7 @@
 #include "controlform.h"
 #include "profileform.h"
 #include "settingsform.h"
-//#include "yesnoform.h"
+#include "yesnoform.h"
 
 MenuForm menufrm;
 
@@ -14,19 +14,24 @@ void	reset_settings(void);
 void	load_settings(void);
 int		save_settings(void);
 
+void tmp_save_settings(void)
+{
+	save_settings();
+}
+
 void onMenufrm_ResetRelease()
 {
-	reset_settings();
+	yesnofrm.yesNo("УСТАНОВИТЬ ЗАВОДСКИЕ значения ", "    параметров и профилей?    ", "   Ранее введенные значения   ", "    параметров и профилей     ", "        будут утеряны!", "УСТАНОВИТЬ", "ОТКАЗАТЬСЯ", &menufrm, reset_settings, 0);
 }
 
 void onMenufrm_LoadRelease()
 {
-	load_settings();
+	yesnofrm.yesNo("ЗАГРУЗИТЬ СОХРАНЕННЫЕ значения", "    параметров и профилей?    ", "   Ранее введенные значения   ", "    параметров и профилей     ", "        будут утеряны!", "ЗАГРУЗИТЬ ", "ОТКАЗАТЬСЯ", &menufrm, load_settings, 0);
 }
 
 void onMenufrm_SaveRelease()
 {
-	save_settings();
+	yesnofrm.yesNo("  СОХРАНИТЬ ТЕКУЩИЕ значения  ", "    параметров и профилей?    ", "  Ранее сохранённые значения  ", "    параметров и профилей     ", "        будут утеряны!", "СОХРАНИТЬ ", "ОТКАЗАТЬСЯ", &menufrm, tmp_save_settings, 0);
 }
 
 

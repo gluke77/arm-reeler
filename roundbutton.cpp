@@ -2,6 +2,7 @@
 
 #include "roundbutton.h"
 #include "lcd.h"
+#include <string.h>
 
 void RoundButton::draw()
 {
@@ -32,5 +33,29 @@ void RoundButton::draw()
 
 		lcd_set_text_cursor(_x, _y);
 		lcd_puts(_text);
+	}
+}
+
+void RoundButton::setText(char * text)
+{
+	int old_count;
+	int new_count;
+	int	i;
+	
+	old_count = strlen(_text);
+	strcpy(_text, text);
+	new_count = strlen(_text);
+	
+	if (_visible)
+	{
+		lcd_set_text_cursor(_x, _y);
+		lcd_puts(_text);
+
+		if (new_count < old_count)
+		{
+			lcd_write_cmd(MWRITE);
+			for (i = 0; i < old_count - new_count; i++)
+				lcd_write_data(' ');
+		}
 	}
 }

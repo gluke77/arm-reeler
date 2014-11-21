@@ -37,6 +37,8 @@ File 1,8,<.\sensorform.cpp><sensorform.cpp>
 File 1,8,<.\togglebutton.cpp><togglebutton.cpp>
 File 1,8,<.\controlform.cpp><controlform.cpp>
 File 1,1,<.\tube.c><tube.c>
+File 1,1,<.\siren.c><siren.c>
+File 1,1,<.\iap.c><iap.c>
 
 
 Options 1,0,0  // Target 'Target 1'

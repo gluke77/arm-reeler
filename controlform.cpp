@@ -1,8 +1,11 @@
 #include "controlform.h"
 #include "menuform.h"
 #include "lcd.h"
+#include "siren.h"
 
 #include "control.h"
+
+char sirenButtonText[][20] = {" —»–≈Õ¿ ¬€ À. ", " —»–≈Õ¿  Œ–. ", " —»–≈Õ¿ ƒÀ. ", " —»–≈Õ¿ ¬ À. "};
 
 ControlForm controlfrm;
 
@@ -32,6 +35,8 @@ void ControlForm::show()
 	dirButton.show();
 	stopLampButton.show();
 
+	sirenButton.show();
+
 	menuButton.show();
 
 	runALampButton.setToggled(test_control(CONTROL_REEL_A_RUN_LAMP));
@@ -48,6 +53,8 @@ void ControlForm::show()
 	layerButton.setToggled(test_control(CONTROL_LAYER_DRIVE));
 	dirButton.setToggled(test_control(CONTROL_LAYER_DIRECTION));
 	stopLampButton.setToggled(test_control(CONTROL_STOP_LAMP));
+
+	sirenButton.setText(sirenButtonText[get_siren_mode()]);
 
 }
 
@@ -71,6 +78,8 @@ void ControlForm::hide()
 	layerButton.hide();
 	dirButton.hide();
 	stopLampButton.hide();
+
+	sirenButton.hide();
 
 	lcd_fill_text(' ');
 	lcd_set_layer(1, LCD_LAYER_ON);
@@ -112,8 +121,11 @@ void ControlForm::onPress(int x, int y)
 		dirButton.press();
 	else if (stopLampButton.hasPoint(x, y))
 		stopLampButton.press();
+	else if (sirenButton.hasPoint(x, y))
+		sirenButton.press();
 	else if (menuButton.hasPoint(x, y))
 		menuButton.press();
+
 }
 
 void ControlForm::onRelease(int x, int y)
@@ -142,6 +154,8 @@ void ControlForm::onRelease(int x, int y)
 		dirButton.release();
 	else if (stopLampButton.hasPoint(x, y))
 		stopLampButton.release();
+	else if (sirenButton.hasPoint(x, y))
+		sirenButton.release();
 	else if (menuButton.isPressed())
 		menuButton.release();
 
@@ -246,5 +260,19 @@ void onControlfrm_stopLampButtonChange(int state)
 		control_on(CONTROL_STOP_LAMP);
 	else
 		control_off(CONTROL_STOP_LAMP);		
+}
+
+void onControlfrm_sirenButtonRelease(void)
+{
+	int siren_mode = get_siren_mode();
+
+	siren_mode++;
+
+	if (SIREN_MODE_COUNT <= siren_mode)
+		siren_mode = SIREN_OFF;
+
+	set_siren_mode(siren_mode);
+
+	controlfrm.sirenButton.setText(sirenButtonText[siren_mode]);
 }
 

@@ -15,6 +15,8 @@ int tube_get_settings_id(void);
 int tube_get_step(void);
 int tube_get_max_layer_pulse_count(void);
 int tube_get_step_by_id(int /* id */);
+int tube_get_max_turn_count(void);
+int tube_get_warn_turn_count(void);
 
 #ifdef __cplusplus__
 }

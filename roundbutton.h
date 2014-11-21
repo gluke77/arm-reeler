@@ -27,6 +27,7 @@ public:
 		};
 
 	virtual void draw();
+	virtual void setText(char * text);
 };
 
 #endif /* _ROUNDBUTTON_H_INCLUDED */

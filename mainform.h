@@ -22,17 +22,17 @@ public:
 
 	ProgressBar	reelAProgressBar;
 	ProgressBar	reelBProgressBar;
+	RoundButton cancelButton;
+	RoundButton lessButton;
+	RoundButton moreButton;
+	RoundButton okButton;
+	RoundButton menuButton;
 	RoundFrame	reelARoundFrame;
 	RoundFrame	reelBRoundFrame;
 	Label		reelALabel;
 	Label		reelBLabel;
 	Label		stepLabel;
 	RoundFrame	stepRoundFrame;
-	RoundButton cancelButton;
-	RoundButton lessButton;
-	RoundButton moreButton;
-	RoundButton okButton;
-	RoundButton menuButton;
 	Label		reelCountLabel;
 	RoundFrame	reelCountFrame;
 

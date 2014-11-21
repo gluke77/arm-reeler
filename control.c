@@ -5,7 +5,7 @@
 
 static int gs_controls = 0;
 
-int controls(void)
+int control_value(void)
 {
 	return gs_controls;
 }

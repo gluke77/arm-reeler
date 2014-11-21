@@ -50,13 +50,14 @@ void shift_out(int);
 #define CONTROL_REEL_DRIVE		(9)
 #define CONTROL_LAYER_DRIVE		(10)
 #define CONTROL_LAYER_DIRECTION	(11)
-#define CONTROL_COUNT			(12)
+#define CONTROL_SIREN			(12)
+#define CONTROL_COUNT			(13)
 
+int control_value(void);
 int	test_control(int /* control */);
 void control_on(int /* control */);
 void control_off(int /* control */);
 void control_init(void);
-
 void do_control(void);
 
 

@@ -65,3 +65,14 @@ int tube_get_max_layer_pulse_count(void)
 {
 	return gs_tube_settings[gs_tube_settings_id].layer_pulse_count;
 }
+
+int tube_get_max_turn_count(void)
+{
+	return gs_tube_settings[gs_tube_settings_id].reel_max_turn_count;
+}
+
+int tube_get_warn_turn_count(void)
+{
+	return gs_tube_settings[gs_tube_settings_id].reel_warn_turn_count;
+}
+

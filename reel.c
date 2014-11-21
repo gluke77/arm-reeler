@@ -3,9 +3,10 @@
 #include "sensor.h"
 #include "control.h"
 #include "layer.h"
-
 #include "usart.h"
 #include "modbus.h"
+#include "siren.h"
+#include "tube.h"
 
 #define REEL_NONE		(-1)
 #define REEL_A			(0)
@@ -39,9 +40,6 @@ typedef struct
 } reel_s;
 
 static reel_s gs_reels[REEL_COUNT];
-
-static char buf[MODBUS_MAX_MSG_LENGTH];
-static modbus_cmd_s	cmd;
 
 int	g_emm_device_id = 0;
 
@@ -103,6 +101,9 @@ void do_reel_drive(void)
 		if (test_control(CONTROL_STOP_LAMP))
 			control_off(CONTROL_STOP_LAMP);
 	
+		if (SIREN_OFF != get_siren_mode())
+			set_siren_mode(SIREN_OFF);
+
 		if (reel_drive_is_run())
 		{
 			reel_drive_stop();
@@ -664,6 +665,12 @@ void do_reel_turn(int reel)
 	{
 		gs_reels[reel].turn_count++;
 		layer_run();
+
+		if ((gs_reels[reel].turn_count >= tube_get_max_turn_count()) && (SIREN_LONG != get_siren_mode()))
+			set_siren_mode(SIREN_LONG);
+		else if ((gs_reels[reel].turn_count >= tube_get_warn_turn_count()) && (SIREN_SHORT != get_siren_mode()))
+			set_siren_mode(SIREN_SHORT);
+
 	}
 
 	gs_reels[reel].turn_prev_state = turn_state;

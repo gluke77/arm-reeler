@@ -402,7 +402,7 @@ void MainForm::update()
 		}
 		else
 		{
-			reelCountLabel.setText("йюрсьйю B %02.0f бхрйнб");
+			reelCountLabel.setText("йюрсьйю а %02.0f бхрйнб");
 			reelCountLabel.setValue(reel_turn_count(REEL_B));		
 		}
 		

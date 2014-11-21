@@ -25,6 +25,8 @@ void onControlfrm_layerButtonChange(int state);
 void onControlfrm_dirButtonChange(int state);
 void onControlfrm_stopLampButtonChange(int state);
 
+void onControlfrm_sirenButtonRelease(void);
+
 
 
 class ControlForm: public Form
@@ -46,6 +48,8 @@ public:
 	ToggleButton	dirButton;
 	ToggleButton	stopLampButton;
 
+	RoundButton		sirenButton;
+
 	RoundButton menuButton;
 
 	ControlForm() : runALampButton(8, 6, 96, 40, 2, 1, "À. œ”—  ¿"), leavesALampButton(8, 54, 96, 88, 2, 4, "À. À≈œ. ¿"),
@@ -54,7 +58,7 @@ public:
 		openBButton(112, 102, 208, 136, 15, 7, " Œ“ –. ¡ "), closeBButton(112, 150, 208, 184, 15, 10, " «¿ –. ¡ "),
 		reelButton(224, 6, 311, 40, 29, 1, "œ”—   ¿“."), layerButton(224, 54, 311, 88, 29, 4, "œ”—  ” À."),
 		dirButton(224, 102, 311, 136, 29, 7, "Õ¿œ–.” À."), stopLampButton(224, 150, 311, 184, 29, 10, " À. —“Œœ "),
-		menuButton(255, 195, 303, 235, 33, 13, "Ã≈Õﬁ")
+		sirenButton(8, 198, 208, 232, 2, 13, " —»–≈Õ¿ ¬€ À. "), menuButton(255, 195, 303, 235, 33, 13, "Ã≈Õﬁ")
 	{
 		menuButton.setOnRelease(onControlfrm_MenuButtonRelease);
 
@@ -72,6 +76,8 @@ public:
 		layerButton.setOnChange( onControlfrm_layerButtonChange);
 		dirButton.setOnChange( onControlfrm_dirButtonChange);
 		stopLampButton.setOnChange( onControlfrm_stopLampButtonChange);
+
+		sirenButton.setOnRelease(onControlfrm_sirenButtonRelease);
 	}
 
 	virtual void setVisible(int v);

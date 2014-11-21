@@ -67,7 +67,7 @@ void reel_tension_set_value(int reel, int value);
 
 void do_reel(void);
 
-int reel_tusn_is_on(int /* reel */);
+int reel_turn_is_on(int /* reel */);
 void do_reel_turn(int /* reel */);
 int reel_turn_count(int /* reel */);
 

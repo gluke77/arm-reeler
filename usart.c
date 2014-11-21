@@ -152,7 +152,8 @@ void usart0_read(void)
 		//SETBIT(UCSR0B, RXEN0);
 		USART0_RS485_READ; 
 		_delay_ms(5);
-		USART0_RX_INT_ENABLE;
+		if (USART_INT_ENABLE == usart0_int_mode)
+			USART0_RX_INT_ENABLE;
 	}
 }
 
@@ -503,7 +504,8 @@ void usart1_read(void)
 		//SETBIT(UCSR0B, RXEN0);
 		USART1_RS485_READ; 
 		_delay_ms(5);
-		USART1_RX_INT_ENABLE;
+		if (USART_INT_ENABLE == usart1_int_mode)
+			USART1_RX_INT_ENABLE;
 	}
 }
 

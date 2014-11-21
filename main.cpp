@@ -1035,6 +1035,9 @@ int process_emm(void)
 	if (RESULT_OK != res)
 		return res;
 
+
+	return res;	// 2010-01-16 test
+
 	if (g_emm_id == cmd.device_id && 
 		MODBUS_READ == cmd.cmd_code &&
 		MODBUS_ACK == cmd.cmd_type)

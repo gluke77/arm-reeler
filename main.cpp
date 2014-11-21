@@ -111,7 +111,7 @@ int main(void)
 
 		do_touch();
 
-		if (controlfrm.isVisible())
+		if (!controlfrm.isVisible())
 		{
 			do_reel();
 		}
@@ -121,11 +121,8 @@ int main(void)
 
 		process_usart1();
 
-//		msec_end = timer_mseconds_total;
-
-//		sprintf(buf, "duration = %d\n", msec_end - msec_begin);
-
-//		usart0_puts(buf);
+		//sprintf(buf, "2nd duration = %d, msecs = %d\n", msec_end - msec_begin, msec_end);
+		//usart0_puts(buf);
 
 	}
 }

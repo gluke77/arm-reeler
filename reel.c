@@ -2,6 +2,7 @@
 
 #include "sensor.h"
 #include "control.h"
+#include "layer.h"
 
 #include "usart.h"
 #include "modbus.h"
@@ -23,6 +24,7 @@ typedef struct
 	int		tension_button_prev_state;
 	int		tension_state;
 	int		tension_value;
+	int		turn_prev_state;
 } reel_s;
 
 static reel_s gs_reels[REEL_COUNT];
@@ -93,8 +95,10 @@ void do_reel_drive(void)
 			reel_drive_stop();
 			reel_tension_off(REEL_A);
 			reel_tension_off(REEL_B);
-
 		}
+
+		if (layer_is_run())
+			layer_stop();
 	}
 	else if (reel_drive_is_stopped())
 	{
@@ -105,6 +109,7 @@ void do_reel_drive(void)
 			return;
 
 		reel_drive_run();
+		layer_goto_begin();
 	}
 }
 
@@ -502,6 +507,34 @@ void do_reel_leaves_open_close(int reel)
 	}
 }
 
+int	reel_turn_is_on(int reel)
+{
+	if (REEL_A == reel)
+		return test_sensor(SENSOR_REEL_TURN_A);
+	else if (REEL_B == reel)
+		return test_sensor(SENSOR_REEL_TURN_B);
+	else
+		return 0;
+}
+
+void do_reel_turn(int reel)
+{
+	int	turn_state;
+
+	if ((REEL_A != reel) && (REEL_B != reel))
+		return;
+
+	if (test_control(CONTROL_STOP_LAMP))
+		return;
+
+	turn_state = reel_turn_is_on(reel);
+
+	if (gs_reels[reel].turn_prev_state && !turn_state && (reel_get_selected() == reel) && reel_drive_is_run())
+		layer_run();
+	
+	gs_reels[reel].turn_prev_state = turn_state;
+}
+
 void do_reel(void)
 {
 	do_reel_drive();
@@ -510,9 +543,11 @@ void do_reel(void)
 	do_reel_leaves_lamp_blink(REEL_A);
 	do_reel_leaves_open_close(REEL_A);
 	do_reel_tension(REEL_A);
+	do_reel_turn(REEL_A);
 
 	do_reel_leaves(REEL_B);
 	do_reel_leaves_lamp_blink(REEL_B);
 	do_reel_leaves_open_close(REEL_B);
 	do_reel_tension(REEL_B);
+	do_reel_turn(REEL_B);
 }
